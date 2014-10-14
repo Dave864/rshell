@@ -3,9 +3,10 @@
 
 int main()
 {
+	//taking in the command from the terminal
 	std::cout << "$ ";
 	std::string command;
 	getline(std::cin, command);
-	std::cout << command << std::endl;
+	//parsing through the command
 	return 0;
 }
