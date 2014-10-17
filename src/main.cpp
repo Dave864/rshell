@@ -12,11 +12,13 @@ void Parse(char *& word, const char *& connector)
 //Tells if c is in word
 bool FindC(char *& word, const char * c)
 {
-	for(unsigned int i = 0; i < sizeof(word-sizeof(c)+1); i++)
+	unsigned int c_sz;
+	for(c_sz = 0; c[c_sz] != '\0'; c_sz++); 
+	for(unsigned int i = 0; word[i+c_sz-1] != '\0' ; i++)
 	{
 		if(c[0] == word[i])
 		{
-			for(unsigned int j = 1; j < sizeof(word); j++)
+			for(unsigned int j = 1; j < c_sz; j++)
 			{
 				if(c[j] != word[i+j])
 				{
