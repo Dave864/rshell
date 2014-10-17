@@ -14,7 +14,11 @@ int main()
 	std::string input;
 	getline(std::cin, input);
 	//Checks to if there are any comments and ignores them if they exist
-	char * command; 
+	char * c_str_in = new char [input.size()+1];
+	strcpy(c_str_in, input.c_str()); 
+	char * command = strtok(c_str_in, "#");
+	std::cout << command << std::endl;
+	delete[] c_str_in;
 	//determines if there are any connectors and sets them as the token
 	//if one exists
 	/*const char * sem_Col = ";";
