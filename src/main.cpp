@@ -48,27 +48,25 @@ int main()
 
 	//determines if there are any connectors and sets them as the token
 	//if one exists
-	/*
 	const char * sem_Col = ";";
 	const char * or_Op = "||";
 	const char * and_Op = "&&";
-	*/
 	if(FindC(command, ";"))
 	{
 		//set token as ';' and parse through command
-		//Parse(command, sem_Col);
+		Parse(command, sem_Col);
 		std::cout << "connector is a ;\n";
 	}
 	else if(FindC(command, "||"))
 	{
 		//set token as "||" and parse through command
-		//Parse(command, or_Op);
+		Parse(command, or_Op);
 		std::cout << "connector is a ||\n";
 	}
 	else if(FindC(command, "&&"))
 	{
 		//set token as "&&" and parse through command
-		//Parse(command, and_Op);
+		Parse(command, and_Op);
 		std::cout << "connector is a &&\n";
 	}
 	//run execvp on command
