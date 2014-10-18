@@ -2,14 +2,43 @@
 #include <string>
 #include <string.h>
 
+//creates an array of strings from command with each string being whitespace separated characters
+void GetArray(char *& command)
+{
+	char* elmt; 
+	for(int i = 0; command[i] != '\0'; i++)
+	{
+		//keeps going until non-whitespace is found
+		if(!isspace(command[i]))
+		{
+			int sz = i;
+			int strt = i;
+			for(; (command[i] != '\0') && !isspace(command[i]); i++);
+			sz = i-sz;
+			elmt = new char[sz+1];
+			for(int j = 0; j < sz; j++)
+			{
+				elmt[j] = command[strt+j];
+			}
+			elmt[sz] = '\0';
+			std::cout << elmt << std::endl;
+		}
+	}
+}
+
 void Parse(char *& word, const char *& connector)
 {
-	char * command = strtok(word, connector);
-	std::cout << command << std::endl;
+	char* command = strtok(word, connector);
+	while(command != NULL)
+	{
+		std::cout << command << std::endl;
+		//run execvp on command
+		command = strtok(NULL, connector);
+	}
 	return;
 }
 
-//Tells if c is in word
+//tells if c is in word
 bool FindC(char *& word, const char * c)
 {
 	unsigned int c_sz;
@@ -57,21 +86,19 @@ int main()
 	{
 		//set token as ';' and parse through command
 		Parse(command, sem_Col);
-		std::cout << "connector is a ;\n";
 	}
 	else if(FindC(command, "||"))
 	{
 		//set token as "||" and parse through command
 		Parse(command, or_Op);
-		std::cout << "connector is a ||\n";
 	}
 	else if(FindC(command, "&&"))
 	{
 		//set token as "&&" and parse through command
 		Parse(command, and_Op);
-		std::cout << "connector is a &&\n";
 	}
 	//run execvp on command
+	GetArray(command);
 	delete[] c_str_in;
 	return 0;
 }
