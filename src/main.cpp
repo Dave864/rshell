@@ -2,15 +2,19 @@
 #include <string>
 #include <string.h>
 
-//creates an array of strings from command with each string being whitespace separated characters
-void GetArray(char *& command)
+//creates an array of strings from command with each string being whitespace 
+//separated characters
+void GetArray(char *& command, char ** com_array)
 {
 	char* elmt; 
+	char ** tmp;
+	int array_sz = 1;
 	for(int i = 0; command[i] != '\0'; i++)
 	{
-		//keeps going until non-whitespace is found
 		if(!isspace(command[i]))
 		{
+			//extracts the characters into elmnt until the 
+			//next whitespace
 			int sz = i;
 			int strt = i;
 			for(; (command[i] != '\0') && !isspace(command[i]); i++);
@@ -21,9 +25,32 @@ void GetArray(char *& command)
 				elmt[j] = command[strt+j];
 			}
 			elmt[sz] = '\0';
-			std::cout << elmt << std::endl;
+
+			//copies elmt into com_array
+			tmp = com_array;
+			array_sz++;
+			com_array = new char*[array_sz];
+			
+			delete[] tmp;
+			if(command[i] == '\0')
+			{
+				break;
+			}
 		}
 	}
+}
+
+//runs command in the command and returns whether it executed or not
+void RunCom(char *& command)
+{
+	char * com_array[1];
+	com_array[0] = NULL;
+	GetArray(command, com_array);
+	for(int i = 0; com_array[i] != NULL; i++)
+	{
+		std::cout << com_array[i] << std::endl;
+	}
+	return;
 }
 
 void Parse(char *& word, const char *& connector)
@@ -31,8 +58,9 @@ void Parse(char *& word, const char *& connector)
 	char* command = strtok(word, connector);
 	while(command != NULL)
 	{
-		std::cout << command << std::endl;
+		std::cout << "String to look at: " << command << std::endl;
 		//run execvp on command
+		RunCom(command);
 		command = strtok(NULL, connector);
 	}
 	return;
@@ -98,7 +126,10 @@ int main()
 		Parse(command, and_Op);
 	}
 	//run execvp on command
-	GetArray(command);
+	else
+	{
+		RunCom(command);
+	}
 	delete[] c_str_in;
 	return 0;
 }
