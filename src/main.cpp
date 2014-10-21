@@ -3,6 +3,8 @@
 #include <string>
 #include <string.h>
 
+//Increases the size of com_array by 1 and appends to_add and a NULL pointer
+//at the end respectively
 void expand_array(char **& com_array, char *& to_add, std::vector<int>& Sizes)
 {
 	char ** tmp;
@@ -22,15 +24,17 @@ void expand_array(char **& com_array, char *& to_add, std::vector<int>& Sizes)
 
 //create an array of strings from command with each string being whitespace 
 //separated characters
-void GetArray(char ** com_array,char *& command)
+void GetArray(char **& com_array,char *& command)
 {
 	char* elmt; 
+	com_array = new char*[1];
+	com_array[0] = NULL;
 	std::vector<int> Sizes(0);
 	for(int i = 0; command[i] != '\0'; i++)
 	{
 		if(!isspace(command[i]))
 		{
-			//extracts the characters into elmnt until the 
+			//extracts the characters into elmt until the 
 			//next whitespace
 			int sz = i;
 			int strt = i;
@@ -55,8 +59,7 @@ void GetArray(char ** com_array,char *& command)
 //runs command in the command and returns whether it executed or not
 void RunCom(char *& command)
 {
-	char * com_array[1];
-	com_array[0] = NULL;
+	char ** com_array;
 	GetArray(com_array, command);
 	for(int i = 0; com_array[i] != NULL; i++)
 	{
@@ -65,6 +68,8 @@ void RunCom(char *& command)
 	return;
 }
 
+//Goes through word, extracting commands seperated by connector, and runs execvp
+//on each command as it is extracted
 void Parse(char *& word, const char *& connector)
 {
 	char* command = strtok(word, connector);
