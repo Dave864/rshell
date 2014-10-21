@@ -23,6 +23,8 @@ void GetArray(char *& command, char ** com_array)
 {
 	char* elmt; 
 	std::vector <int> sizes;
+	char ** tmp;
+	int array_sz = 1;
 	for(int i = 0; command[i] != '\0'; i++)
 	{
 		if(!isspace(command[i]))
@@ -40,9 +42,10 @@ void GetArray(char *& command, char ** com_array)
 			}
 			elmt[sz] = '\0';
 			sizes.push_back(sz);
-			//append char value of num sz to end of string sizes
 			expand_array(command, sizes);
 			//expand com_array to include elmt
+			//copies elmt into com_array
+			
 			if(command[i] == '\0')
 			{
 				break;
