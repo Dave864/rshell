@@ -3,28 +3,29 @@
 #include <string>
 #include <string.h>
 
-void expand_array(char ** com_array, std::vector <int> sizes)
+void expand_array(char **& com_array, char *& to_add, std::vector<int>& Sizes)
 {
 	char ** tmp;
-	//copies elmt into com_array
 	tmp = com_array;
-	com_array = new char*[sizes.size()+1];
-	for(unsigned int k = 0; k < sizes.size(); k++)
+	com_array = new char*[Sizes.size()+1];
+	for(unsigned int i = 0; i < Sizes.size(); i++)
 	{
-		com_array[k] = new char[sizes[k]];
-		com_array[k] = tmp[k];
+		com_array[i] = new char[Sizes[i]];
+		if(tmp[i] != NULL)
+		{
+			strcpy(com_array[i], tmp[i]);
+		}
 	}
-	com_array[sizes.size()] = NULL;
+	strcpy(com_array[Sizes.size()-1], to_add);
+	com_array[Sizes.size()] = NULL;
 }
 
 //create an array of strings from command with each string being whitespace 
 //separated characters
-void GetArray(char *& command, char ** com_array)
+void GetArray(char ** com_array,char *& command)
 {
 	char* elmt; 
-	std::vector <int> sizes;
-	char ** tmp;
-	int array_sz = 1;
+	std::vector<int> Sizes(0);
 	for(int i = 0; command[i] != '\0'; i++)
 	{
 		if(!isspace(command[i]))
@@ -41,11 +42,8 @@ void GetArray(char *& command, char ** com_array)
 				elmt[j] = command[strt+j];
 			}
 			elmt[sz] = '\0';
-			sizes.push_back(sz);
-			expand_array(command, sizes);
-			//expand com_array to include elmt
-			//copies elmt into com_array
-			
+			Sizes.push_back(sz+1);
+			expand_array(com_array, elmt, Sizes);
 			if(command[i] == '\0')
 			{
 				break;
@@ -59,11 +57,11 @@ void RunCom(char *& command)
 {
 	char * com_array[1];
 	com_array[0] = NULL;
-	GetArray(command, com_array);
-	/*for(int i = 0; com_array[i] != NULL; i++)
+	GetArray(com_array, command);
+	for(int i = 0; com_array[i] != NULL; i++)
 	{
 		std::cout << com_array[i] << std::endl;
-	}*/
+	}
 	return;
 }
 
