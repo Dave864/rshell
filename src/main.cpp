@@ -2,6 +2,12 @@
 #include <vector>
 #include <string>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 //Increases the size of com_array by 1 and appends to_add and a NULL pointer
 //at the end respectively
@@ -61,9 +67,33 @@ void RunCom(char *& command)
 {
 	char ** com_array;
 	GetArray(com_array, command);
-	for(int i = 0; com_array[i] != NULL; i++)
+	/*for(int i = 0; com_array[i] != NULL; i++)
 	{
 		std::cout << com_array[i] << std::endl;
+	}*/
+	//create a new process which runs execvp and wait for it to end
+	int status;
+	pid_t PID;
+	PID = fork();
+	if(PID == -1)
+	{
+		perror("fork");
+	}
+	else if(PID == 0)
+	{
+		if(execvp(com_array[0], com_array) == -1)
+		{
+			perror("execvp");
+		}
+		exit(0);
+	}
+	else
+	{
+		PID = wait(&status);
+		if(PID == -1)
+		{
+			perror("wait");
+		}
 	}
 	return;
 }
@@ -75,8 +105,6 @@ void Parse(char *& word, const char *& connector)
 	char* command = strtok(word, connector);
 	while(command != NULL)
 	{
-		std::cout << "String to look at: " << command << std::endl;
-		//run execvp on command
 		RunCom(command);
 		command = strtok(NULL, connector);
 	}
