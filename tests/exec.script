@@ -1,0 +1,54 @@
+Script started on Tue 21 Oct 2014 11:33:23 PM PDT
+~
+amacp001@hammer $ cd cs1000[K/hw/rshell/
+~/cs100/hw/rshell
+amacp001@hammer $ ls
+exec.script  LICENSE  Makefile  README.md  [0m[01;34msrc[0m/  [01;34mtests[0m/
+[m~/cs100/hw/rshell
+amacp001@hammer $ make
+mkdir -p "bin"
+cd bin; g++ ../src/main.cpp -Wall -Werror -pedantic -ansi -o rshell
+~/cs100/hw/rshell
+amacp001@hammer $ ls
+[0m[01;34mbin[0m/  exec.script  LICENSE  Makefile  README.md  [01;34msrc[0m/  [01;34mtests[0m/
+[m~/cs100/hw/rshell
+amacp001@hammer $ bin/rshelll[K
+$ not a command
+execvp: No such file or directory
+$ pwd
+/class/classes/amacp001/cs100/hw/rshell
+$ pwd; not a command
+/class/classes/amacp001/cs100/hw/rshell
+execvp: No such file or directory
+$ ls -r  ; echo "hello world"                         			ls -r   ; 	echo   	"hello word"
+~/cs100/hw/rshell
+amacp001@hammer $ bin/rshell
+$ ls; echo : "hello world"
+~/cs100/hw/rshell
+amacp001@hammer $ bin/rshellls[Kmake[2Plscd cs100/hw/rshell/exit[Kcd cs100/hw/rshell/ls[Kmake[2Plsbin/rshell[Kbin/rshell
+$ not a command || ||    echo "test    hello world"
+~/cs100/hw/rshell
+amacp001@hammer $ bin/rshell
+$ 				pwd #this is a comment
+/class/classes/amacp001/cs100/hw/rshell
+$ #	ls -a  ; pwd  ; echo "hello world"
+$ msy  yshell
+execvp: No such file or directory
+$ rshell
+execvp: No such file or directory
+$ bim n/rshell
+$ #exit
+$ exit
+$ exit
+~/cs100/hw/rshell
+amacp001@hammer $ bin/rshell
+$ cd src
+execvp: No such file or directory
+$ echo "hello world                 	;	hell    pwd
+/class/classes/amacp001/cs100/hw/rshell
+$ 	pwd ; ls ;   || echo "hello"
+~/cs100/hw/rshell
+amacp001@hammer $ exit
+exit
+
+Script done on Tue 21 Oct 2014 11:46:15 PM PDT
