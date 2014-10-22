@@ -1,5 +1,4 @@
 ##RSHELL##
-====
 
 Licensing information
 
@@ -15,4 +14,7 @@ Directions on how to run file when cloned to local machine
 
 Basic program overview
 
-Bug list
+#Bug list
+
+* Unable to handle commands chained by connectors
+* Unable to run the cd command
