@@ -63,7 +63,7 @@ void GetArray(char **& com_array,char *& command)
 }
 
 //runs command in the command and returns whether it executed or not
-void RunCom(char *& command)
+int RunCom(char *& command)
 {
 	char ** com_array;
 	GetArray(com_array, command);
@@ -85,7 +85,7 @@ void RunCom(char *& command)
 		{
 			perror("execvp");
 		}
-		exit(0);
+		exit(1);
 	}
 	else
 	{
@@ -94,8 +94,12 @@ void RunCom(char *& command)
 		{
 			perror("wait");
 		}
+		if(WIFEXITED(status))
+		{
+			return (WEXITSTATUS(status));
+		}
 	}
-	return;
+	return 1;
 }
 
 //Goes through word, extracting commands seperated by connector, and runs execvp
@@ -103,9 +107,24 @@ void RunCom(char *& command)
 void Parse(char *& word, const char *& connector)
 {
 	char* command = strtok(word, connector);
+	bool failed = true;
 	while(command != NULL)
 	{
-		RunCom(command);
+		failed = RunCom(command);
+		if(strcmp(connector, "||") == 0)
+		{
+			if(!failed)
+			{
+				return;
+			}
+		}
+		else if(strcmp(connector, "&&") == 0)
+		{
+			if(failed)
+			{
+				return;
+			}
+		}
 		command = strtok(NULL, connector);
 	}
 	return;
@@ -135,46 +154,49 @@ bool FindC(char *& word, const char * c)
 
 int main()
 {
-	//recieves the input from the user
-	std::cout << "$ ";
-	std::string input;
-	getline(std::cin, input);
+	while(1)
+	{
+		//recieves the input from the user
+		std::cout << "$ ";
+		std::string input;
+		getline(std::cin, input);
 
-	//Checks to if there are any comments and ignores them if they exist
-	if(input[input.find_first_not_of(" \t\n\v\f\r")] == '#')
-	{
-		//Execute execvp with an empty array
-		return 0;
-	}
-	char * c_str_in = new char [input.size()+1];
-	strcpy(c_str_in, input.c_str()); 
-	char * command = strtok(c_str_in, "#");
+		//Checks to if there are any comments and ignores them if they exist
+		if(input[input.find_first_not_of(" \t\n\v\f\r")] == '#')
+		{
+			//Execute execvp with an empty array
+			continue;
+		}
+		char * c_str_in = new char [input.size()+1];
+		strcpy(c_str_in, input.c_str()); 
+		char * command = strtok(c_str_in, "#");
 
-	//determines if there are any connectors and sets them as the token
-	//if one exists
-	const char * sem_Col = ";";
-	const char * or_Op = "||";
-	const char * and_Op = "&&";
-	if(FindC(command, ";"))
-	{
-		//set token as ';' and parse through command
-		Parse(command, sem_Col);
+		//determines if there are any connectors and sets them as the token
+		//if one exists
+		const char * sem_Col = ";";
+		const char * or_Op = "||";
+		const char * and_Op = "&&";
+		if(FindC(command, ";"))
+		{
+			//set token as ';' and parse through command
+			Parse(command, sem_Col);
+		}
+		else if(FindC(command, "||"))
+		{
+			//set token as "||" and parse through command
+			Parse(command, or_Op);
+		}
+		else if(FindC(command, "&&"))
+		{
+			//set token as "&&" and parse through command
+			Parse(command, and_Op);
+		}
+		//run execvp on command
+		else
+		{
+			RunCom(command);
+		}
+		delete[] c_str_in;
 	}
-	else if(FindC(command, "||"))
-	{
-		//set token as "||" and parse through command
-		Parse(command, or_Op);
-	}
-	else if(FindC(command, "&&"))
-	{
-		//set token as "&&" and parse through command
-		Parse(command, and_Op);
-	}
-	//run execvp on command
-	else
-	{
-		RunCom(command);
-	}
-	delete[] c_str_in;
 	return 0;
 }
