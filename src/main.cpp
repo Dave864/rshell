@@ -67,10 +67,6 @@ int RunCom(char *& command)
 {
 	char ** com_array;
 	GetArray(com_array, command);
-	/*for(int i = 0; com_array[i] != NULL; i++)
-	{
-		std::cout << com_array[i] << std::endl;
-	}*/
 	//create a new process which runs execvp and wait for it to end
 	int status;
 	pid_t PID;
@@ -164,12 +160,17 @@ int main()
 		//Checks to if there are any comments and ignores them if they exist
 		if(input[input.find_first_not_of(" \t\n\v\f\r")] == '#')
 		{
-			//Execute execvp with an empty array
 			continue;
 		}
 		char * c_str_in = new char [input.size()+1];
 		strcpy(c_str_in, input.c_str()); 
 		char * command = strtok(c_str_in, "#");
+
+		//Checks if the command "exit" was entered and if so, end the program
+		if(FindC(command, "exit"))
+		{
+			return 0;
+		}
 
 		//determines if there are any connectors and sets them as the token
 		//if one exists
