@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <stdio.h>
@@ -26,6 +27,36 @@ void checkFlags(bool* flags, int argc, char** argv)
 			}
 		}
 	}
+	return;
+}
+
+//adds destination to the end of the path
+void addPath(char* path, char* destination)
+{
+	//does not add destination if it is a flag
+	if(destination[0] == '-')
+	{
+		return;
+	}
+	int dest_sz = 0;
+	int pth_sz = 0;
+	for(int i = 0; destination[i] != '\0'; i++)
+	{
+		dest_sz ++;
+	}
+	for(int i = 0; path[i] != '\0'; i++)
+	{
+		pth_sz++;
+	}
+	char * old_pth = path;
+	path = new char[pth_sz + dest_sz + 1];
+	strcpy(path, old_pth);
+	delete[] old_pth;
+	for(int i = 0; i < dest_sz; i++)
+	{
+		path[pth_sz+i] = destination[i];
+	}
+	path[pth_sz + dest_sz] = '\0';
 	return;
 }
 
@@ -77,7 +108,7 @@ void	runOnWhich(bool* flags, int argc, char** argv)
 	{
 		for(int i = 1; i < argc; i++)
 		{
-			//FIXME:create filename
+			addPath(dirName, argv[i]);
 			runLS(flags, dirName);
 		}
 	}
