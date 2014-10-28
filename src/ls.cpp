@@ -38,6 +38,7 @@ void addPath(char* path, char* destination)
 	{
 		return;
 	}
+	//get sizes of path and destination
 	int dest_sz = 0;
 	int pth_sz = 0;
 	for(int i = 0; destination[i] != '\0'; i++)
@@ -48,15 +49,18 @@ void addPath(char* path, char* destination)
 	{
 		pth_sz++;
 	}
+	//create path from old_pth then append a '/' at the end 
+	//followed by destination
 	char * old_pth = path;
-	path = new char[pth_sz + dest_sz + 1];
+	path = new char[pth_sz + dest_sz + 2];
 	strcpy(path, old_pth);
 	delete[] old_pth;
+	path[pth_sz+1] = '/';
 	for(int i = 0; i < dest_sz; i++)
 	{
-		path[pth_sz+i] = destination[i];
+		path[pth_sz + 1 + i] = destination[i];
 	}
-	path[pth_sz + dest_sz] = '\0';
+	path[pth_sz + dest_sz + 1] = '\0';
 	return;
 }
 
