@@ -42,7 +42,18 @@ void runLS(bool* flags, char* dirName)
 	errno = 0;
 	while((direntp = readdir(dirp)) != NULL)
 	{
-		cout << direntp->d_name << endl;
+		//if flag -a isn't set, ignore hidden files
+		if(!flags[0])
+		{
+			if(direntp->d_name[0] != '.')
+			{
+				cout << direntp->d_name << endl;
+			}
+		}
+		else
+		{
+			cout << direntp->d_name << endl;
+		}
 	}
 	if(errno != 0)
 	{
@@ -67,6 +78,7 @@ void	runOnWhich(bool* flags, int argc, char** argv)
 		for(int i = 1; i < argc; i++)
 		{
 			//FIXME:create filename
+			runLS(flags, dirName);
 		}
 	}
 	//runs ls on all files in current directory
