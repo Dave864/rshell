@@ -29,8 +29,36 @@ void checkFlags(bool* flags, int argc, char** argv)
 	return;
 }
 
-//runs the ls command on the files in argc, implementing any specified optional flags
-void	runOnDir(bool* flags, int argc, char** argv)
+//runs ls on dirName, implementing any specified flags
+void runLS(bool* flags, char* dirName)
+{
+	DIR* dirp = opendir(dirName);
+	if(dirp == NULL)
+	{
+		perror("opendir");
+		exit(1);
+	}
+	dirent* direntp;
+	errno = 0;
+	while((direntp = readdir(dirp)) != NULL)
+	{
+		cout << direntp->d_name << endl;
+	}
+	if(errno != 0)
+	{
+		perror("readdir");
+		exit(1);
+	}
+	if(closedir(dirp) == -1)
+	{
+		perror("closedir");
+		exit(1);
+	}
+	return;
+}
+
+//determines which files to run ls on
+void	runOnWhich(bool* flags, int argc, char** argv)
 {
 	char dirName[] = ".";
 	//runs ls on specified files in argc
@@ -44,23 +72,7 @@ void	runOnDir(bool* flags, int argc, char** argv)
 	//runs ls on all files in current directory
 	else
 	{
-		DIR* dirp = opendir(dirName);
-		if(dirp == NULL)
-		{
-			perror("opendir");
-			exit(1);
-		}
-		dirent* direntp;
-		errno = 0;
-		while((direntp = readdir(dirp)) != NULL)
-		{
-			cout << direntp->d_name << endl;
-		}
-		if(errno != 0)
-		{
-			perror("readdir");
-			exit(1);
-		}
+		runLS(flags, dirName);
 	}
 	return;
 }
@@ -73,6 +85,6 @@ int main(int argc, char** argv)
 	//2 -R
 	bool flags[3] = {false, false, false};
 	checkFlags(flags, argc, argv);
-	runOnDir(flags, argc, argv);
+	runOnWhich(flags, argc, argv);
 	return 0;
 }
