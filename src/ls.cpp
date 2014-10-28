@@ -1,4 +1,11 @@
 #include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 using namespace std;
 
 //checks argc for any flags and sets the appropriate index in flags if so
@@ -22,6 +29,42 @@ void checkFlags(bool* flags, int argc, char** argv)
 	return;
 }
 
+//runs the ls command on the files in argc, implementing any specified optional flags
+void	runOnDir(bool* flags, int argc, char** argv)
+{
+	char dirName[] = ".";
+	//runs ls on specified files in argc
+	if(argc > 1)
+	{
+		for(int i = 1; i < argc; i++)
+		{
+			//FIXME:create filename
+		}
+	}
+	//runs ls on all files in current directory
+	else
+	{
+		DIR* dirp = opendir(dirName);
+		if(dirp == NULL)
+		{
+			perror("opendir");
+			exit(1);
+		}
+		dirent* direntp;
+		errno = 0;
+		while((direntp = readdir(dirp)) != NULL)
+		{
+			cout << direntp->d_name << endl;
+		}
+		if(errno != 0)
+		{
+			perror("readdir");
+			exit(1);
+		}
+	}
+	return;
+}
+
 int main(int argc, char** argv)
 {
 	//indicates if a flag is set
@@ -30,20 +73,6 @@ int main(int argc, char** argv)
 	//2 -R
 	bool flags[3] = {false, false, false};
 	checkFlags(flags, argc, argv);
-	cout << "Flag -a is ";
-	if(flags[0])
-		cout << "set\n";
-	else
-		cout << "not set\n";
-	cout << "Flag -l is ";
-	if(flags[1])
-		cout << "set\n";
-	else
-		cout << "not set\n";
-	cout << "Flag -R is ";
-	if(flags[2])
-		cout << "set\n";
-	else
-		cout << "not set\n";
+	runOnDir(flags, argc, argv);
 	return 0;
 }
