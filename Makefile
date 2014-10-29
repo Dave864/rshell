@@ -15,5 +15,6 @@ rshell:
 	cd bin ;g++ ../src/main.cpp $(CFLAGS) -o rshell
 
 clean:
-	cd bin; rm rshell ls
+	cd bin; if [ -a rshell ] ;then rm rshell; fi
+	cd bin; if [ -a ls ] ; then rm ls; fi
 	rmdir bin
