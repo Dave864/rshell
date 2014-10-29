@@ -10,8 +10,8 @@
 using namespace std;
 
 #define FLAG_A 1
-#define FLAG_R 2
-#define FLAG_L 4
+#define FLAG_L 2
+#define FLAG_R 4
 
 //checks argc for any flags and sets the appropriate index in flags if so
 void checkFlags(int & flags, int argc, char** argv)
@@ -25,22 +25,23 @@ void checkFlags(int & flags, int argc, char** argv)
 				//check for -a
 				flags = (argv[i][j] == 'a') ? flags|FLAG_A: flags|0;
 				//check for -l
-				flags = (argv[i][j] == 'l') ? flags|FLAG_R: flags|0;
+				flags = (argv[i][j] == 'l') ? flags|FLAG_L: flags|0;
 				//check for -R
-				flags = (argv[i][j] == 'R') ? flags|FLAG_L: flags|0;
+				flags = (argv[i][j] == 'R') ? flags|FLAG_R: flags|0;
 			}
 		}
 	}
 	return;
 }
 
-//adds destination to the end of the path
-void addPath(char* path, char* destination)
+//adds destination to the end of the path and returns 
+//whether this was done or not
+bool addPath(char* path, char* destination)
 {
 	//does not add destination if it is a flag
 	if(destination[0] == '-')
 	{
-		return;
+		return false;
 	}
 	//get sizes of path and destination
 	int dest_sz = 0;
@@ -65,7 +66,7 @@ void addPath(char* path, char* destination)
 		path[pth_sz + 1 + i] = destination[i];
 	}
 	path[pth_sz + dest_sz + 1] = '\0';
-	return;
+	return true;
 }
 
 //displays additional information about file
@@ -103,7 +104,7 @@ void showStat(const char* file)
 	w = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
 	x = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
 	cout << r << w << x << ' ';
-	cout << endl;
+	cout << file;
 	return;
 }
 
@@ -120,32 +121,39 @@ void runLS(int flags, char* dirName)
 	errno = 0;
 	while((direntp = readdir(dirp)) != NULL)
 	{
-		//if flag -a isn't set, ignore hidden files
-		if(!flags & FLAG_A)
+		//if flag -a is set, display hidden files
+		if(flags & FLAG_A)
+		{
+			if(flags & FLAG_L)
+			{
+				showStat(direntp->d_name);
+				cout << endl;
+			}
+			else
+			{
+				cout << direntp->d_name << "  ";
+			}
+		}
+		else
 		{
 			if(direntp->d_name[0] != '.')
 			{
 				if(flags & FLAG_L)
 				{
 					showStat(direntp->d_name);
+					cout << endl;
 				}
 				else
 				{
-					cout << direntp->d_name << " ";
+					cout << direntp->d_name << "  ";
 				}
 			}
 		}
-		else
-		{
-			if(flags & FLAG_L)
-			{
-				showStat(direntp->d_name);
-			}
-			else
-			{
-				cout << direntp->d_name << " ";
-			}
-		}
+	}
+	if(flags & FLAG_L);
+	else
+	{
+		cout << endl;
 	}
 	if(errno != 0)
 	{
@@ -167,9 +175,17 @@ void	runOnWhich(int flags, int argc, char** argv)
 	//runs ls on specified files in argc
 	if(argc > 1)
 	{
+		bool allFlags = true;
 		for(int i = 1; i < argc; i++)
 		{
-			addPath(dirName, argv[i]);
+			if(addPath(dirName, argv[i]))
+			{
+				runLS(flags, dirName);
+				allFlags = false;
+			}
+		}
+		if(allFlags)
+		{
 			runLS(flags, dirName);
 		}
 	}
