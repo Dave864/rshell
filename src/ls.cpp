@@ -9,8 +9,12 @@
 #include <errno.h>
 using namespace std;
 
+#define FLAG_A 1
+#define FLAG_R 2
+#define FLAG_L 4
+
 //checks argc for any flags and sets the appropriate index in flags if so
-void checkFlags(bool* flags, int argc, char** argv)
+void checkFlags(int & flags, int argc, char** argv)
 {
 	for(int i = 1; i < argc; i++)
 	{
@@ -19,11 +23,11 @@ void checkFlags(bool* flags, int argc, char** argv)
 			for(int j = 1; argv[i][j] != '\0'; j++)
 			{
 				//check for -a
-				flags[0] = (argv[i][j] == 'a') ? true : flags[0];
+				flags = (argv[i][j] == 'a') ? flags|FLAG_A: flags|0;
 				//check for -l
-				flags[1] = (argv[i][j] == 'l') ? true : flags[1];
+				flags = (argv[i][j] == 'l') ? flags|FLAG_R: flags|0;
 				//check for -R
-				flags[2] = (argv[i][j] == 'R') ? true : flags[2];
+				flags = (argv[i][j] == 'R') ? flags|FLAG_L: flags|0;
 			}
 		}
 	}
@@ -65,7 +69,7 @@ void addPath(char* path, char* destination)
 }
 
 //runs ls on dirName, implementing any specified flags
-void runLS(bool* flags, char* dirName)
+void runLS(int flags, char* dirName)
 {
 	DIR* dirp = opendir(dirName);
 	if(dirp == NULL)
@@ -78,7 +82,7 @@ void runLS(bool* flags, char* dirName)
 	while((direntp = readdir(dirp)) != NULL)
 	{
 		//if flag -a isn't set, ignore hidden files
-		if(!flags[0])
+		if(!flags & FLAG_A)
 		{
 			if(direntp->d_name[0] != '.')
 			{
@@ -104,7 +108,7 @@ void runLS(bool* flags, char* dirName)
 }
 
 //determines which files to run ls on
-void	runOnWhich(bool* flags, int argc, char** argv)
+void	runOnWhich(int flags, int argc, char** argv)
 {
 	char dirName[] = ".";
 	//runs ls on specified files in argc
@@ -127,10 +131,10 @@ void	runOnWhich(bool* flags, int argc, char** argv)
 int main(int argc, char** argv)
 {
 	//indicates if a flag is set
-	//0 -a
-	//1 -l
-	//2 -R
-	bool flags[3] = {false, false, false};
+	//1 -a
+	//2 -l
+	//4 -R
+	int flags = 0;
 	checkFlags(flags, argc, argv);
 	runOnWhich(flags, argc, argv);
 	return 0;
