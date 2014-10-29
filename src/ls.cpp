@@ -68,6 +68,45 @@ void addPath(char* path, char* destination)
 	return;
 }
 
+//displays additional information about file
+void showStat(const char* file)
+{
+	struct stat statBuf;
+	if(stat(file, &statBuf) == -1)
+	{
+		perror("stat");
+		exit(1);
+	}
+	//displays the permissions of file
+	char r, w, x;
+	if(S_ISDIR(statBuf.st_mode))
+	{
+		cout << 'd';
+	}
+	else if(S_ISLNK(statBuf.st_mode))
+	{
+		cout << 'l';
+	}
+	else
+	{
+		cout << '-';
+	}
+	r = (S_IRUSR & statBuf.st_mode) ? 'r': '-';
+	w = (S_IWUSR & statBuf.st_mode) ? 'w': '-';
+	x = (S_IXUSR & statBuf.st_mode) ? 'x': '-';
+	cout << r << w << x;
+	r = (S_IRGRP & statBuf.st_mode) ? 'r': '-';
+	w = (S_IWGRP & statBuf.st_mode) ? 'w': '-';
+	x = (S_IXGRP & statBuf.st_mode) ? 'x': '-';
+	cout << r << w << x;
+	r = (S_IROTH & statBuf.st_mode) ? 'r': '-';
+	w = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
+	x = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
+	cout << r << w << x << ' ';
+	cout << endl;
+	return;
+}
+
 //runs ls on dirName, implementing any specified flags
 void runLS(int flags, char* dirName)
 {
@@ -86,12 +125,26 @@ void runLS(int flags, char* dirName)
 		{
 			if(direntp->d_name[0] != '.')
 			{
-				cout << direntp->d_name << endl;
+				if(flags & FLAG_L)
+				{
+					showStat(direntp->d_name);
+				}
+				else
+				{
+					cout << direntp->d_name << " ";
+				}
 			}
 		}
 		else
 		{
-			cout << direntp->d_name << endl;
+			if(flags & FLAG_L)
+			{
+				showStat(direntp->d_name);
+			}
+			else
+			{
+				cout << direntp->d_name << " ";
+			}
 		}
 	}
 	if(errno != 0)
