@@ -104,6 +104,7 @@ void showStat(const char* file)
 	w = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
 	x = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
 	cout << r << w << x << ' ';
+	//displays the file's name
 	cout << file;
 	return;
 }
