@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -39,36 +40,15 @@ void checkFlags(int & flags, int argc, char** argv)
 
 //adds destination to the end of the path and returns 
 //whether this was done or not
-bool addPath(char* path, char* destination)
+bool addPath(string& path, char* destination)
 {
 	//does not add destination if it is a flag
 	if(destination[0] == '-')
 	{
 		return false;
 	}
-	//get sizes of path and destination
-	int dest_sz = 0;
-	int pth_sz = 0;
-	for(int i = 0; destination[i] != '\0'; i++)
-	{
-		dest_sz ++;
-	}
-	for(int i = 0; path[i] != '\0'; i++)
-	{
-		pth_sz++;
-	}
-	//create path from old_pth then append a '/' at the end 
-	//followed by destination
-	char * old_pth = path;
-	path = new char[pth_sz + dest_sz + 2];
-	strcpy(path, old_pth);
-	path[pth_sz+1] = '/';
-	for(int i = 0; i < dest_sz; i++)
-	{
-		path[pth_sz + 1 + i] = destination[i];
-	}
-	path[pth_sz + dest_sz + 1] = '\0';
-	delete[] old_pth;
+	path.append("/");
+	path.append(destination);
 	return true;
 }
 
@@ -159,10 +139,17 @@ void showStat(const char* file)
 	return;
 }
 
-//runs ls on dirName, implementing any specified flags
-void runLS(int flags, char* dirName)
+//recursively displays the contents of all directories and their subdirectories
+void runLS_R(int flags, string dirName)
 {
-	DIR* dirp = opendir(dirName);
+	cout << "run ls -R" << endl;
+	return;
+}
+
+//runs ls on directory dirName, implementing any specified flags
+void runOnDir(int flags, string& dirName)
+{
+	DIR* dirp = opendir(dirName.c_str());
 	if(dirp == NULL)
 	{
 		perror("opendir");
@@ -220,10 +207,37 @@ void runLS(int flags, char* dirName)
 	return;
 }
 
+//determines whether dirName is a file or directory and calls runOnDir if
+//dirName is a directory
+void runLS(int flags, string& dirName)
+{
+	struct stat statBuf;
+	if(stat(dirName.c_str(), &statBuf) == -1)
+	{
+		perror("stat");
+		exit(1);
+	}
+	if(S_ISREG(statBuf.st_mode))
+	{
+		if(flags & FLAG_L)
+		{
+			showStat(dirName.c_str());
+		}
+		else
+		{
+			cout << dirName << "  ";
+		}
+	}
+	else
+	{
+		runOnDir(flags, dirName);
+	}
+}
+
 //determines which files to run ls on
 void	runOnWhich(int flags, int argc, char** argv)
 {
-	char dirName[] = ".";
+	string dirName = ".";
 	//runs ls on specified files in argc
 	if(argc > 1)
 	{
@@ -232,13 +246,27 @@ void	runOnWhich(int flags, int argc, char** argv)
 		{
 			if(addPath(dirName, argv[i]))
 			{
-				runLS(flags, dirName);
+				if(flags & FLAG_R)
+				{
+					runLS_R(flags, dirName);
+				}
+				else
+				{
+					runLS(flags, dirName);
+				}
 				allFlags = false;
 			}
 		}
 		if(allFlags)
 		{
-			runLS(flags, dirName);
+				if(flags & FLAG_R)
+				{
+					runLS_R(flags, dirName);
+				}
+				else
+				{
+					runLS(flags, dirName);
+				}
 		}
 	}
 	//runs ls on all files in current directory
@@ -251,10 +279,6 @@ void	runOnWhich(int flags, int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-	//indicates if a flag is set
-	//1 -a
-	//2 -l
-	//4 -R
 	int flags = 0;
 	checkFlags(flags, argc, argv);
 	runOnWhich(flags, argc, argv);
