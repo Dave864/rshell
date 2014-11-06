@@ -224,6 +224,7 @@ void runLS(int flags, string& dirName)
 	if(stat(dirName.c_str(), &statBuf) == -1)
 	{
 		perror("stat");
+		cerr << "line 227\n";
 		exit(1);
 	}
 	if(S_ISREG(statBuf.st_mode))
@@ -246,7 +247,7 @@ void runLS(int flags, string& dirName)
 //determines which files to run ls on
 void	runOnWhich(int flags, int argc, char** argv)
 {
-	string curDir= ".";
+	string curDir = ".";
 	string dirName;
 	//runs ls on specified files in argc
 	if(argc > 1)
@@ -268,15 +269,16 @@ void	runOnWhich(int flags, int argc, char** argv)
 				allFlags = false;
 			}
 		}
+		//if all arguments are flags, run ls on curDir
 		if(allFlags)
 		{
 				if(flags & FLAG_R)
 				{
-					runLS_R(flags, dirName);
+					runLS_R(flags, curDir);
 				}
 				else
 				{
-					runLS(flags, dirName);
+					runLS(flags, curDir);
 				}
 		}
 	}
