@@ -2,10 +2,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pwd.h>
+#include <grp.h>
 #include <errno.h>
 using namespace std;
 
@@ -59,13 +62,13 @@ bool addPath(char* path, char* destination)
 	char * old_pth = path;
 	path = new char[pth_sz + dest_sz + 2];
 	strcpy(path, old_pth);
-	delete[] old_pth;
 	path[pth_sz+1] = '/';
 	for(int i = 0; i < dest_sz; i++)
 	{
 		path[pth_sz + 1 + i] = destination[i];
 	}
 	path[pth_sz + dest_sz + 1] = '\0';
+	delete[] old_pth;
 	return true;
 }
 
@@ -107,9 +110,51 @@ void showStat(const char* file)
 	//displays number of hard links
 	cout << statBuf.st_nlink << ' ';
 	//displays owner name
+	struct passwd *pw; 
+	errno = 0;
+	if((pw = getpwuid(statBuf.st_uid)) == NULL)
+	{
+		if(errno != 0)
+		{
+			perror("getwuid");
+			exit(1);
+		}
+	}
+	cout << pw->pw_name << ' ';
 	//displays group name
+	struct group *gr;
+	errno = 0;
+	if((gr = getgrgid(statBuf.st_gid)) == NULL)
+	{
+		if(errno != 0)
+		{
+			perror("getgrgid");
+			exit(1);
+		}
+	}
+	cout << gr->gr_name << ' ';
 	//displays the size in bytes
+	cout << statBuf.st_size << ' ';
 	//displays the last modified time
+	time_t tm = statBuf.st_mtime;
+	struct tm time;
+	if(localtime_r(&tm, &time) == NULL)
+	{
+		perror("localtime");
+		exit(1);
+	}
+	char mod_time[80];
+	errno = 0;
+	if(strftime(mod_time, sizeof(mod_time), "%b %e %R", &time) == 0)
+	{
+		if(errno != 0)
+		{
+			perror("strftime");
+			exit(1);
+		}
+	}
+	cout << mod_time << ' ';
+	//displays the name of the file
 	cout << file;
 	return;
 }
@@ -158,8 +203,7 @@ void runLS(int flags, char* dirName)
 			}
 		}
 	}
-	if(flags & FLAG_L);
-	else
+	if(!(flags & FLAG_L))
 	{
 		cout << endl;
 	}
