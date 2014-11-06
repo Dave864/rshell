@@ -224,7 +224,6 @@ void runLS(int flags, string& dirName)
 	if(stat(dirName.c_str(), &statBuf) == -1)
 	{
 		perror("stat");
-		cerr << "line 227\n";
 		exit(1);
 	}
 	if(S_ISREG(statBuf.st_mode))
