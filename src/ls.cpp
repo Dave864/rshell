@@ -104,6 +104,12 @@ void showStat(const char* file)
 	w = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
 	x = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
 	cout << r << w << x << ' ';
+	//displays number of hard links
+	cout << statBuf.st_nlink << ' ';
+	//displays owner name
+	//displays group name
+	//displays the size in bytes
+	//displays the last modified time
 	cout << file;
 	return;
 }
@@ -131,6 +137,7 @@ void runLS(int flags, char* dirName)
 			}
 			else
 			{
+				//need to output in format similar to ls
 				cout << direntp->d_name << "  ";
 			}
 		}
@@ -145,6 +152,7 @@ void runLS(int flags, char* dirName)
 				}
 				else
 				{
+					//need to output in format similar to ls
 					cout << direntp->d_name << "  ";
 				}
 			}
