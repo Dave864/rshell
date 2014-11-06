@@ -38,18 +38,27 @@ void checkFlags(int & flags, int argc, char** argv)
 	return;
 }
 
-//adds destination to the end of the path and returns 
-//whether this was done or not
-bool addPath(string& path, char* destination)
+//adds destination to the end of the path 
+void addPath(string& path, char* destination)
 {
 	//does not add destination if it is a flag
 	if(destination[0] == '-')
 	{
-		return false;
+		return;
 	}
 	path.append("/");
 	path.append(destination);
-	return true;
+	return;
+}
+
+//checks if file is a flag
+bool isFlag(char* file)
+{
+	if(file[0] == '-')
+	{
+		return true;
+	}
+	return false;
 }
 
 //displays additional information about file
@@ -225,7 +234,7 @@ void runLS(int flags, string& dirName)
 		}
 		else
 		{
-			cout << dirName << "  ";
+			cout << dirName << endl;
 		}
 	}
 	else
@@ -237,15 +246,17 @@ void runLS(int flags, string& dirName)
 //determines which files to run ls on
 void	runOnWhich(int flags, int argc, char** argv)
 {
-	string dirName = ".";
+	string curDir= ".";
+	string dirName;
 	//runs ls on specified files in argc
 	if(argc > 1)
 	{
 		bool allFlags = true;
 		for(int i = 1; i < argc; i++)
 		{
-			if(addPath(dirName, argv[i]))
+			if(!isFlag(argv[i]))
 			{
+				dirName = argv[i];
 				if(flags & FLAG_R)
 				{
 					runLS_R(flags, dirName);
@@ -272,7 +283,7 @@ void	runOnWhich(int flags, int argc, char** argv)
 	//runs ls on all files in current directory
 	else
 	{
-		runLS(flags, dirName);
+		runLS(flags, curDir);
 	}
 	return;
 }
