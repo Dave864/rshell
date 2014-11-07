@@ -144,14 +144,15 @@ void showStat(const char* file)
 	}
 	cout << mod_time << ' ';
 	//displays the name of the file
-	cout << file;
+	string file_name(file);
+	unsigned found = file_name.find_last_of('/');
+	cout << file_name.substr(found+1) << endl;
 	return;
 }
 
 //recursively displays the contents of all directories and their subdirectories
 void runLS_R(int flags, string dirName)
 {
-	cout << "run ls -R" << endl;
 	return;
 }
 
@@ -164,6 +165,7 @@ void runOnDir(int flags, string& dirName)
 		perror("opendir");
 		exit(1);
 	}
+	string file = dirName;
 	dirent* direntp;
 	errno = 0;
 	while((direntp = readdir(dirp)) != NULL)
@@ -173,8 +175,9 @@ void runOnDir(int flags, string& dirName)
 		{
 			if(flags & FLAG_L)
 			{
-				showStat(direntp->d_name);
-				cout << endl;
+				addPath(file, direntp->d_name);
+				showStat(file.c_str());
+				file = dirName;
 			}
 			else
 			{
@@ -188,8 +191,9 @@ void runOnDir(int flags, string& dirName)
 			{
 				if(flags & FLAG_L)
 				{
-					showStat(direntp->d_name);
-					cout << endl;
+					addPath(file, direntp->d_name);
+					showStat(file.c_str());
+					file = dirName;
 				}
 				else
 				{
