@@ -11,6 +11,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <errno.h>
+#include "printLs.h"
 using namespace std;
 
 #define FLAG_A 1
@@ -170,11 +171,13 @@ void runOnDir(int flags, string& dirName)
 	errno = 0;
 	while((direntp = readdir(dirp)) != NULL)
 	{
+		//**ADD SUB_DIR NODE
 		//if flag -a is set, display hidden files
 		if(flags & FLAG_A)
 		{
 			if(flags & FLAG_L)
 			{
+				//**ADD LONG LIST DATA TO SUB_DIR NODE
 				addPath(file, direntp->d_name);
 				showStat(file.c_str());
 				file = dirName;
@@ -191,6 +194,7 @@ void runOnDir(int flags, string& dirName)
 			{
 				if(flags & FLAG_L)
 				{
+					//**ADD LONG LIST DATA TO SUB_DIR NODE
 					addPath(file, direntp->d_name);
 					showStat(file.c_str());
 					file = dirName;
@@ -234,6 +238,7 @@ void runLS(int flags, string& dirName)
 	{
 		if(flags & FLAG_L)
 		{
+			//**ADD LONG LIST DATA TO NODE
 			showStat(dirName.c_str());
 		}
 		else
@@ -243,6 +248,7 @@ void runLS(int flags, string& dirName)
 	}
 	else
 	{
+		//**ADD SUB_DIR LIST
 		runOnDir(flags, dirName);
 	}
 }
@@ -267,6 +273,7 @@ void	runOnWhich(int flags, int argc, char** argv)
 				}
 				else
 				{
+					//**ADD NODE DIRNAME
 					runLS(flags, dirName);
 				}
 				allFlags = false;
@@ -281,6 +288,7 @@ void	runOnWhich(int flags, int argc, char** argv)
 				}
 				else
 				{
+					//**ADD NODE .
 					runLS(flags, curDir);
 				}
 		}
@@ -288,6 +296,7 @@ void	runOnWhich(int flags, int argc, char** argv)
 	//runs ls on all files in current directory
 	else
 	{
+		//**ADD NODE .
 		runLS(flags, curDir);
 	}
 	return;
