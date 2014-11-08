@@ -1,10 +1,20 @@
 #include <iostream>
 using namespace std;
 
+struct Long_list
+{
+	char* mode;
+	int hard_lnk;
+	char* grp;
+	char* usr;
+	char* date;
+	char* name;
+};
+
 struct Dir
 {
 	string name;
-	//longlist info
+	Long_list* info;
 	Dir* subdir;
 	Dir* next;
 	Dir(string n):name(n), subdir(NULL), next(NULL){}
@@ -43,6 +53,13 @@ class PrintLs
 			curSub = curSub->next;
 		}
 
+		void addL_mode();
+		void addL_link();
+		void addL_grp();
+		void addL_usr();
+		void addL_date();
+		void addL_name();
+
 		void Print()
 		{
 			//if only one Dir node, print subdir if it exists, otherwise, print name
@@ -57,7 +74,7 @@ class PrintLs
 					//print out subdirectory
 					curSub = first->subdir;
 					//add name to array
-					while(curSub->next != NULL)
+					for(; curSub->next != NULL; curSub = curSub->next)
 					{
 						//add name to array
 					}
@@ -65,6 +82,7 @@ class PrintLs
 				}
 				return;
 			}
+			
 		}
 		//void getLongList();
 		~PrintLs()
