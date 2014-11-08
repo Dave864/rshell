@@ -15,7 +15,7 @@ struct Long_list
 	char* grp;
 	int sze;
 	char* date;
-	char* name;
+	const char* name;
 	Long_list(int lnk = 0):mode(), hard_lnk(lnk), usr(), grp(), sze(0), date(), name(){}
 };
 
@@ -257,7 +257,7 @@ class PrintLs
 		}
 
 		//add name long list info to current node
-		void addL_name(char* name)
+		void addL_name(const char* name)
 		{
 			if(first == NULL)
 			{
@@ -284,11 +284,10 @@ class PrintLs
 			int lnkWdth = 0;
 			int colWdth = 0;
 			Dir* out = first;
-			bool pLongList = (out->info != NULL) ? true: false;
 			//print contents of current directory
 			if(out->next == NULL)
 			{
-				out = out->subdir;
+				bool pLongList = (out->subdir->info != NULL) ? true: false;
 				if(pLongList)
 				{
 					lnkWdth = subDirLnkWdth(out); 
@@ -299,7 +298,7 @@ class PrintLs
 				}
 				int colNum = (colWdth == 0) ? 0: BUF_WIDTH/colWdth;
 				int curCol = 0;
-				for(; out != NULL; out = out->next)
+				for(out = out->subdir; out != NULL; out = out->next)
 				{
 					//print in long list format
 					if(pLongList)
@@ -326,11 +325,15 @@ class PrintLs
 								cout << endl;
 								curCol = 0;
 							}
-							cout << setfill(' ') << setw(colWdth) << left
-								<< out->name << ' ';
+							cout.width(colWdth+1);
+							cout << left << out->name << setfill(' ') << ' ';
 							curCol++;
 						}
 					}
+				}
+				if(!pLongList)
+				{
+					cout << endl;
 				}
 			}
 			//print contents of arguments passed via command line
@@ -342,7 +345,7 @@ class PrintLs
 		~PrintLs()
 		{
 			Dir* tmp;
-			while(first->next != NULL)
+			while(first != NULL)
 			{
 				while(first->subdir != NULL)
 				{
@@ -356,6 +359,5 @@ class PrintLs
 				delete tmp->info;
 				delete tmp;
 			}
-			delete first;
 		}
 };

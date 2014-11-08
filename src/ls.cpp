@@ -18,8 +18,6 @@ using namespace std;
 #define FLAG_L 2
 #define FLAG_R 4
 
-PrintLs output();
-
 //checks argc for any flags and sets the appropriate index in flags if so
 void checkFlags(int & flags, int argc, char** argv)
 {
@@ -65,7 +63,7 @@ bool isFlag(char* file)
 }
 
 //displays additional information about file
-void showStat(const char* file)
+void showStat(const char* file, PrintLs & output)
 {
 	struct stat statBuf;
 	if(stat(file, &statBuf) == -1)
@@ -103,9 +101,10 @@ void showStat(const char* file)
 	mode[7] = (S_IROTH & statBuf.st_mode) ? 'r': '-';
 	mode[8] = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
 	mode[9] = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
-	//displays number of hard links
-	cout << statBuf.st_nlink << ' ';
-	//displays owner name
+	output.addL_mode(mode);//class func call
+	//obtains number of hard links
+	output.addL_link(statBuf.st_nlink);//class func call
+	//obtains owner name
 	struct passwd *pw; 
 	errno = 0;
 	if((pw = getpwuid(statBuf.st_uid)) == NULL)
@@ -116,8 +115,8 @@ void showStat(const char* file)
 			exit(1);
 		}
 	}
-	cout << pw->pw_name << ' ';
-	//displays group name
+	output.addL_usr(pw->pw_name);//class func call
+	//obtains group name
 	struct group *gr;
 	errno = 0;
 	if((gr = getgrgid(statBuf.st_gid)) == NULL)
@@ -128,10 +127,10 @@ void showStat(const char* file)
 			exit(1);
 		}
 	}
-	cout << gr->gr_name << ' ';
-	//displays the size in bytes
-	cout << statBuf.st_size << ' ';
-	//displays the last modified time
+	output.addL_grp(gr->gr_name);//class func call
+	//obtains the size in bytes
+	output.addL_sze(statBuf.st_size);//class func call
+	//obtains the last modified time
 	time_t tm = statBuf.st_mtime;
 	struct tm time;
 	if(localtime_r(&tm, &time) == NULL)
@@ -149,11 +148,11 @@ void showStat(const char* file)
 			exit(1);
 		}
 	}
-	cout << mod_time << ' ';
-	//displays the name of the file
+	output.addL_date(mod_time);//class func call
+	//obtains the name of the file
 	string file_name(file);
 	unsigned found = file_name.find_last_of('/');
-	cout << file_name.substr(found+1) << endl;
+	output.addL_name(file_name.substr(found+1).c_str());//class func call
 	return;
 }
 
@@ -164,7 +163,7 @@ void runLS_R(int flags, string dirName)
 }
 
 //runs ls on directory dirName, implementing any specified flags
-void runOnDir(int flags, string& dirName)
+void runOnDir(int flags, string& dirName, PrintLs & output)
 {
 	DIR* dirp = opendir(dirName.c_str());
 	if(dirp == NULL)
@@ -177,21 +176,19 @@ void runOnDir(int flags, string& dirName)
 	errno = 0;
 	while((direntp = readdir(dirp)) != NULL)
 	{
-		//**ADD SUB_DIR NODE
 		//if flag -a is set, display hidden files
 		if(flags & FLAG_A)
 		{
 			if(flags & FLAG_L)
 			{
-				//**ADD LONG LIST DATA TO SUB_DIR NODE
 				addPath(file, direntp->d_name);
-				showStat(file.c_str());
+				output.addSubDir(direntp->d_name);//class func call
+				showStat(file.c_str(), output);
 				file = dirName;
 			}
 			else
 			{
-				//need to output in format similar to ls
-				cout << direntp->d_name << "  ";
+				output.addSubDir(direntp->d_name);//class func call
 			}
 		}
 		else
@@ -200,22 +197,17 @@ void runOnDir(int flags, string& dirName)
 			{
 				if(flags & FLAG_L)
 				{
-					//**ADD LONG LIST DATA TO SUB_DIR NODE
 					addPath(file, direntp->d_name);
-					showStat(file.c_str());
+					output.addSubDir(direntp->d_name);//class func call
+					showStat(file.c_str(), output);
 					file = dirName;
 				}
 				else
 				{
-					//need to output in format similar to ls
-					cout << direntp->d_name << "  ";
+					output.addSubDir(direntp->d_name);//class func call
 				}
 			}
 		}
-	}
-	if(!(flags & FLAG_L))
-	{
-		cout << endl;
 	}
 	if(errno != 0)
 	{
@@ -232,7 +224,7 @@ void runOnDir(int flags, string& dirName)
 
 //determines whether dirName is a file or directory and calls runOnDir if
 //dirName is a directory
-void runLS(int flags, string& dirName)
+void runLS(int flags, string& dirName, PrintLs & output)
 {
 	struct stat statBuf;
 	if(stat(dirName.c_str(), &statBuf) == -1)
@@ -244,8 +236,7 @@ void runLS(int flags, string& dirName)
 	{
 		if(flags & FLAG_L)
 		{
-			//**ADD LONG LIST DATA TO NODE
-			showStat(dirName.c_str());
+			showStat(dirName.c_str(), output);
 		}
 		else
 		{
@@ -255,12 +246,12 @@ void runLS(int flags, string& dirName)
 	else
 	{
 		//**ADD SUB_DIR LIST
-		runOnDir(flags, dirName);
+		runOnDir(flags, dirName, output);
 	}
 }
 
 //determines which files to run ls on
-void	runOnWhich(int flags, int argc, char** argv)
+void	runOnWhich(int flags, int argc, char** argv, PrintLs & output)
 {
 	string curDir = ".";
 	string dirName;
@@ -279,8 +270,8 @@ void	runOnWhich(int flags, int argc, char** argv)
 				}
 				else
 				{
-					//**ADD NODE DIRNAME
-					runLS(flags, dirName);
+					output.addDir(dirName);//class func call
+					runLS(flags, dirName, output);
 				}
 				allFlags = false;
 			}
@@ -294,30 +285,32 @@ void	runOnWhich(int flags, int argc, char** argv)
 				}
 				else
 				{
-					//**ADD NODE .
-					runLS(flags, curDir);
+					output.addDir(curDir);//class func call
+					runLS(flags, curDir, output);
 				}
 		}
 	}
 	//runs ls on all files in current directory
 	else
 	{
-		//**ADD NODE .
-		runLS(flags, curDir);
+		output.addDir(curDir);//class func call
+		runLS(flags, curDir, output);
 	}
 	return;
 }
 
 int main(int argc, char** argv)
 {
+	PrintLs output;
 	int flags = 0;
 	checkFlags(flags, argc, argv);
-	runOnWhich(flags, argc, argv);
+	runOnWhich(flags, argc, argv, output);
 	if(flags & FLAG_R)
 	{
 	}
 	else
 	{
+		output.Print();
 	}
 	return 0;
 }

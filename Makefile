@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror -pedantic -ansi
+CFLAGS=-g -Wall -Werror -pedantic -ansi
 BIN="bin"
 
 all: src/printLs.h
