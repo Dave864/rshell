@@ -18,6 +18,8 @@ using namespace std;
 #define FLAG_L 2
 #define FLAG_R 4
 
+PrintLs output();
+
 //checks argc for any flags and sets the appropriate index in flags if so
 void checkFlags(int & flags, int argc, char** argv)
 {
@@ -311,5 +313,11 @@ int main(int argc, char** argv)
 	int flags = 0;
 	checkFlags(flags, argc, argv);
 	runOnWhich(flags, argc, argv);
+	if(flags & FLAG_R)
+	{
+	}
+	else
+	{
+	}
 	return 0;
 }

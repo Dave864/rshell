@@ -1,17 +1,22 @@
 #include <iostream>
+#include <iomanip>
+#include <math.h>
+#include <string.h>
 using namespace std;
 
 #define BUF_WIDTH 80
 
+//holds information that is displayed when the -l flag is called in ls
 struct Long_list
 {
 	char* mode;
 	int hard_lnk;
-	char* grp;
 	char* usr;
+	char* grp;
+	int sze;
 	char* date;
 	char* name;
-	Long_list(int lnk = 0):mode(), hard_lnk(lnk), grp(), usr(), date(), name(){}
+	Long_list(int lnk = 0):mode(), hard_lnk(lnk), usr(), grp(), sze(0), date(), name(){}
 };
 
 struct Dir
@@ -23,79 +28,73 @@ struct Dir
 	Dir(string n):name(n), info(NULL), subdir(NULL), next(NULL){}
 };
 
-struct To_Print
-{
-	string name;
-	bool isDir;
-	Long_list* info;
-	To_Print* next;
-	To_Print(string n):name(n), isDir(false), info(NULL), next(NULL){}
-};
-
 class PrintLs
 {
 	private:
 		Dir* first;
 		Dir* cur;
 		Dir* curSub;
-		To_Print* output;
 
-		void SetUpOut()
+		//get column width of all files in current directory
+		int subDirColWdth(Dir* lookHere)
 		{
-			if(output != NULL)
+			if(lookHere->subdir == NULL)
 			{
-				return;
+				return 0;
 			}
-			if(first == NULL)
+			unsigned int len = 0;
+			Dir* tmp;
+			for(tmp = lookHere->subdir; tmp != NULL; tmp = tmp->next)
 			{
-				return;
+				len = (strlen(tmp->name.c_str()) > len) ? strlen(tmp->name.c_str()): len;
 			}
-			cur = first;
-			To_Print* tmp;
-			output = new To_Print(cur->name);
-			output->info = cur->info;
-			output->isDir = true;
-			tmp = output;
-			tmp = tmp->next;
-			if(cur->subdir != NULL)
-			{
-				for(curSub = cur->subdir; curSub->next != NULL; curSub = curSub->next)
-				{
-					tmp = new To_Print(curSub->name);
-					tmp->info = curSub->info;
-					tmp = tmp->next;
-				}
-			}
-			for(; cur->next != NULL; cur = cur->next)
-			{
-				tmp = new To_Print(cur->name);
-				tmp->info = cur->info;
-				tmp = output;
-				tmp = tmp->next;
-				if(cur->subdir != NULL)
-				{
-					for(curSub = cur->subdir; curSub->next != NULL; curSub = curSub->next)
-					{
-						tmp = new To_Print(curSub->name);
-						tmp->info = curSub->info;
-						tmp = tmp->next;
-					}
-				}
-			}
+			return len;
 		}
 
-		int getColWidth()
+		//get column width of list of command line arguments
+		int dirColWdth()
 		{
-			return 0;
+			unsigned int len = 0;
+			for(cur = first; cur->next != NULL; cur = cur->next)
+			{
+				len = (strlen(cur->name.c_str()) > len) ? strlen(cur->name.c_str()): len;
+			}
+			return len;
 		}
 
-		int getLnkWidth()
+		//get length of largest size from files in current directory
+		int subDirLnkWdth(Dir* lookHere)
 		{
-			return 0;
+			if(lookHere->subdir == NULL)
+			{
+				return 0;
+			}
+			unsigned int len = 0;
+			unsigned int cnt;
+			Dir* tmp;
+			for(tmp = lookHere->subdir; tmp != NULL; tmp = tmp->next)
+			{
+				cnt = log10(tmp->info->sze);
+				len = (cnt > len) ? cnt: len;
+			}
+			return len;
+		}
+
+		//get length of largest size from command line arguments
+		int dirLnkWdth()
+		{
+			unsigned int len = 0;
+			unsigned int cnt;
+			for(cur = first; cur->next != NULL; cur = cur->next)
+			{
+				cnt = log10(cur->info->sze);
+				len = (cnt > len) ? cnt: len;
+			}
+			return len;
 		}
 
 	public:
-		PrintLs():first(NULL), cur(NULL), curSub(NULL), output(NULL){}
+		PrintLs():first(NULL), cur(NULL), curSub(NULL){}
 		void addDir(string& dir)
 		{
 			if(first == NULL)
@@ -121,6 +120,7 @@ class PrintLs
 			curSub = curSub->next;
 		}
 
+		//add mode long list info to current node
 		void addL_mode(char* mode)
 		{
 			if(first == NULL)
@@ -143,6 +143,7 @@ class PrintLs
 			cur->info->mode = mode;
 		}
 
+		//add number of links long list info to current node
 		void addL_link(int numL)
 		{
 			if(first == NULL)
@@ -163,6 +164,7 @@ class PrintLs
 			}
 		}
 
+		//add group name long list info to current node
 		void addL_grp(char* grp)
 		{
 			if(first == NULL)
@@ -185,6 +187,7 @@ class PrintLs
 			cur->info->grp = grp;
 		}
 
+		//add user name long list info to current node
 		void addL_usr(char* usr)
 		{
 			if(first == NULL)
@@ -207,6 +210,30 @@ class PrintLs
 			cur->info->usr = usr;
 		}
 
+		//add size long list info to crrent node
+		void addL_sze(int size)
+		{
+			if(first == NULL)
+			{
+				return;
+			}
+			if(curSub != NULL)
+			{
+				if(curSub->info == NULL)
+				{
+					curSub->info = new Long_list();
+				}
+				curSub->info->sze = size;
+				return;
+			}
+			if(cur->info == NULL)
+			{
+				cur->info= new Long_list();
+			}
+			cur->info->sze = size;
+		}
+
+		//add date long list info to current node
 		void addL_date(char* date)
 		{
 			if(first == NULL)
@@ -229,6 +256,7 @@ class PrintLs
 			cur->info->date = date;
 		}
 
+		//add name long list info to current node
 		void addL_name(char* name)
 		{
 			if(first == NULL)
@@ -253,8 +281,62 @@ class PrintLs
 
 		void Print()
 		{
-			SetUpOut();
-			//To_Print* tmp = output;
+			int lnkWdth = 0;
+			int colWdth = 0;
+			Dir* out = first;
+			bool pLongList = (out->info != NULL) ? true: false;
+			//print contents of current directory
+			if(out->next == NULL)
+			{
+				out = out->subdir;
+				if(pLongList)
+				{
+					lnkWdth = subDirLnkWdth(out); 
+				}
+				else
+				{
+					colWdth = subDirColWdth(out);
+				}
+				int colNum = (colWdth == 0) ? 0: BUF_WIDTH/colWdth;
+				int curCol = 0;
+				for(; out != NULL; out = out->next)
+				{
+					//print in long list format
+					if(pLongList)
+					{
+						cout << out->info->mode << ' '
+							<< out->info->hard_lnk << ' '
+							<< out->info->usr << ' '
+							<< out->info->grp << ' '
+							<< setw(lnkWdth) << right << out->info->sze << ' '
+							<< out->info->date << ' '
+							<< out->info->name << endl;
+					}
+					//print just the file names
+					else
+					{
+						if(colNum == 0)
+						{
+							cout << out->name << "  ";
+						}
+						else
+						{
+							if(curCol == colNum)
+							{
+								cout << endl;
+								curCol = 0;
+							}
+							cout << setfill(' ') << setw(colWdth) << left
+								<< out->name << ' ';
+							curCol++;
+						}
+					}
+				}
+			}
+			//print contents of arguments passed via command line
+			else
+			{
+			}
 		}
 
 		~PrintLs()
@@ -274,14 +356,6 @@ class PrintLs
 				delete tmp->info;
 				delete tmp;
 			}
-			To_Print* tmpOut;
-			while(output->next != NULL)
-			{
-				tmpOut = output;
-				output = output->next;
-				delete tmpOut;
-			}
 			delete first;
-			delete output;
 		}
 };
