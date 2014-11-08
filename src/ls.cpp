@@ -71,32 +71,36 @@ void showStat(const char* file)
 		perror("stat");
 		exit(1);
 	}
-	//displays the permissions of file
-	char r, w, x;
+	//gets the permissions of file
+	char mode[11];
+	memset(mode, '\0', 11);
 	if(S_ISDIR(statBuf.st_mode))
 	{
 		cout << 'd';
+		mode[0] = 'd';
 	}
 	else if(S_ISLNK(statBuf.st_mode))
 	{
 		cout << 'l';
+		mode[0] = 'l';
 	}
 	else
 	{
 		cout << '-';
+		mode[0] = '-';
 	}
-	r = (S_IRUSR & statBuf.st_mode) ? 'r': '-';
-	w = (S_IWUSR & statBuf.st_mode) ? 'w': '-';
-	x = (S_IXUSR & statBuf.st_mode) ? 'x': '-';
-	cout << r << w << x;
-	r = (S_IRGRP & statBuf.st_mode) ? 'r': '-';
-	w = (S_IWGRP & statBuf.st_mode) ? 'w': '-';
-	x = (S_IXGRP & statBuf.st_mode) ? 'x': '-';
-	cout << r << w << x;
-	r = (S_IROTH & statBuf.st_mode) ? 'r': '-';
-	w = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
-	x = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
-	cout << r << w << x << ' ';
+	//user permissions
+	mode[1] = (S_IRUSR & statBuf.st_mode) ? 'r': '-';
+	mode[2] = (S_IWUSR & statBuf.st_mode) ? 'w': '-';
+	mode[3] = (S_IXUSR & statBuf.st_mode) ? 'x': '-';
+	//group permissions
+	mode[4] = (S_IRGRP & statBuf.st_mode) ? 'r': '-';
+	mode[5] = (S_IWGRP & statBuf.st_mode) ? 'w': '-';
+	mode[6] = (S_IXGRP & statBuf.st_mode) ? 'x': '-';
+	//others' permissions
+	mode[7] = (S_IROTH & statBuf.st_mode) ? 'r': '-';
+	mode[8] = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
+	mode[9] = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
 	//displays number of hard links
 	cout << statBuf.st_nlink << ' ';
 	//displays owner name

@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+#define BUF_WIDTH 80
+
 struct Long_list
 {
 	char* mode;
@@ -9,6 +11,7 @@ struct Long_list
 	char* usr;
 	char* date;
 	char* name;
+	Long_list(int lnk = 0):mode(), hard_lnk(lnk), grp(), usr(), date(), name(){}
 };
 
 struct Dir
@@ -17,7 +20,16 @@ struct Dir
 	Long_list* info;
 	Dir* subdir;
 	Dir* next;
-	Dir(string n):name(n), subdir(NULL), next(NULL){}
+	Dir(string n):name(n), info(NULL), subdir(NULL), next(NULL){}
+};
+
+struct To_Print
+{
+	string name;
+	bool isDir;
+	Long_list* info;
+	To_Print* next;
+	To_Print(string n):name(n), isDir(false), info(NULL), next(NULL){}
 };
 
 class PrintLs
@@ -26,9 +38,64 @@ class PrintLs
 		Dir* first;
 		Dir* cur;
 		Dir* curSub;
+		To_Print* output;
+
+		void SetUpOut()
+		{
+			if(output != NULL)
+			{
+				return;
+			}
+			if(first == NULL)
+			{
+				return;
+			}
+			cur = first;
+			To_Print* tmp;
+			output = new To_Print(cur->name);
+			output->info = cur->info;
+			output->isDir = true;
+			tmp = output;
+			tmp = tmp->next;
+			if(cur->subdir != NULL)
+			{
+				for(curSub = cur->subdir; curSub->next != NULL; curSub = curSub->next)
+				{
+					tmp = new To_Print(curSub->name);
+					tmp->info = curSub->info;
+					tmp = tmp->next;
+				}
+			}
+			for(; cur->next != NULL; cur = cur->next)
+			{
+				tmp = new To_Print(cur->name);
+				tmp->info = cur->info;
+				tmp = output;
+				tmp = tmp->next;
+				if(cur->subdir != NULL)
+				{
+					for(curSub = cur->subdir; curSub->next != NULL; curSub = curSub->next)
+					{
+						tmp = new To_Print(curSub->name);
+						tmp->info = curSub->info;
+						tmp = tmp->next;
+					}
+				}
+			}
+		}
+
+		int getColWidth()
+		{
+			return 0;
+		}
+
+		int getLnkWidth()
+		{
+			return 0;
+		}
 
 	public:
-		PrintLs():first(NULL), cur(NULL), curSub(NULL){}
+		PrintLs():first(NULL), cur(NULL), curSub(NULL), output(NULL){}
 		void addDir(string& dir)
 		{
 			if(first == NULL)
@@ -39,6 +106,7 @@ class PrintLs
 			}
 			cur->next = new Dir(dir);
 			cur = cur->next;
+			curSub = NULL;
 		}
 
 		void addSubDir(char* subDir)
@@ -53,38 +121,142 @@ class PrintLs
 			curSub = curSub->next;
 		}
 
-		void addL_mode();
-		void addL_link();
-		void addL_grp();
-		void addL_usr();
-		void addL_date();
-		void addL_name();
-
-		void Print()
+		void addL_mode(char* mode)
 		{
-			//if only one Dir node, print subdir if it exists, otherwise, print name
-			if(first->next == NULL)
+			if(first == NULL)
 			{
-				if(first->subdir == NULL)
+				return;
+			}
+			if(curSub != NULL)
+			{
+				if(curSub->info == NULL)
 				{
-					cout << first->name << endl;
+					curSub->info = new Long_list();
 				}
-				else
+				curSub->info->mode = mode;
+				return;
+			}
+			if(cur->info == NULL)
+			{
+				cur->info= new Long_list();
+			}
+			cur->info->mode = mode;
+		}
+
+		void addL_link(int numL)
+		{
+			if(first == NULL)
+			{
+				return;
+			}
+			if(curSub != NULL)
+			{
+				if(curSub->info == NULL)
 				{
-					//print out subdirectory
-					curSub = first->subdir;
-					//add name to array
-					for(; curSub->next != NULL; curSub = curSub->next)
-					{
-						//add name to array
-					}
-					//print out the formatted array
+					curSub->info = new Long_list(numL);
 				}
 				return;
 			}
-			
+			if(cur->info == NULL)
+			{
+				cur->info= new Long_list(numL);
+			}
 		}
-		//void getLongList();
+
+		void addL_grp(char* grp)
+		{
+			if(first == NULL)
+			{
+				return;
+			}
+			if(curSub != NULL)
+			{
+				if(curSub->info == NULL)
+				{
+					curSub->info = new Long_list();
+				}
+				curSub->info->grp= grp;
+				return;
+			}
+			if(cur->info == NULL)
+			{
+				cur->info= new Long_list();
+			}
+			cur->info->grp = grp;
+		}
+
+		void addL_usr(char* usr)
+		{
+			if(first == NULL)
+			{
+				return;
+			}
+			if(curSub != NULL)
+			{
+				if(curSub->info == NULL)
+				{
+					curSub->info = new Long_list();
+				}
+				curSub->info->usr = usr;
+				return;
+			}
+			if(cur->info == NULL)
+			{
+				cur->info= new Long_list();
+			}
+			cur->info->usr = usr;
+		}
+
+		void addL_date(char* date)
+		{
+			if(first == NULL)
+			{
+				return;
+			}
+			if(curSub != NULL)
+			{
+				if(curSub->info == NULL)
+				{
+					curSub->info = new Long_list();
+				}
+				curSub->info->date= date;
+				return;
+			}
+			if(cur->info == NULL)
+			{
+				cur->info= new Long_list();
+			}
+			cur->info->date = date;
+		}
+
+		void addL_name(char* name)
+		{
+			if(first == NULL)
+			{
+				return;
+			}
+			if(curSub != NULL)
+			{
+				if(curSub->info == NULL)
+				{
+					curSub->info = new Long_list();
+				}
+				curSub->info->name = name;
+				return;
+			}
+			if(cur->info == NULL)
+			{
+				cur->info= new Long_list();
+			}
+			cur->info->name = name;
+		}
+
+		void Print()
+		{
+			SetUpOut();
+			//To_Print* tmp = output;
+		}
+
 		~PrintLs()
 		{
 			Dir* tmp;
@@ -94,12 +266,22 @@ class PrintLs
 				{
 					curSub = first->subdir;
 					first->subdir = curSub->next;
+					delete curSub->info;
 					delete curSub;
 				}
 				tmp = first;
 				first = first->next;
+				delete tmp->info;
 				delete tmp;
 			}
+			To_Print* tmpOut;
+			while(output->next != NULL)
+			{
+				tmpOut = output;
+				output = output->next;
+				delete tmpOut;
+			}
 			delete first;
+			delete output;
 		}
 };
