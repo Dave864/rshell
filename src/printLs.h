@@ -77,7 +77,7 @@ class PrintLs
 			Dir* tmp;
 			for(tmp = lookHere->subdir; tmp != NULL; tmp = tmp->next)
 			{
-				cnt = log10(tmp->info->sze);
+				cnt = static_cast<int>(log10(tmp->info->sze)+1);
 				len = (cnt > len) ? cnt: len;
 			}
 			return len;
@@ -90,14 +90,14 @@ class PrintLs
 			unsigned int cnt;
 			for(cur = first; cur->next != NULL; cur = cur->next)
 			{
-				cnt = log10(cur->info->sze);
+				cnt = static_cast<int>(log10(cur->info->sze)+1);
 				len = (cnt > len) ? cnt: len;
 			}
 			return len;
 		}
 
 		//helper function for Print
-		void printHelper(Dir* out, int colWdth, int colNum, int& curCol, bool pLongList/*, int lnkWdth*/)
+		void printHelper(Dir* out, int colWdth, int colNum, int& curCol, bool pLongList, int lnkWdth)
 		{
 			//print in long list format
 			if(pLongList)
@@ -106,7 +106,7 @@ class PrintLs
 					<< out->info->hard_lnk << ' '
 					<< out->info->usr << ' '
 					<< out->info->grp << ' '
-					/*<< setw(lnkWdth) << right*/ << out->info->sze << ' '
+					<< setw(lnkWdth) << right << out->info->sze << ' '
 					<< out->info->date << ' '
 					<< out->name << endl;
 			}
@@ -300,7 +300,7 @@ class PrintLs
 
 		void Print()
 		{
-			//int lnkWdth = 0;
+			int lnkWdth = 0;
 			int colWdth = 0;
 			Dir* out = first;
 			//Run this if up to one non-flag argument was passed
@@ -317,7 +317,7 @@ class PrintLs
 				}
 				if(pLongList)
 				{
-					//lnkWdth = subDirLnkWdth(out); 
+					lnkWdth = subDirLnkWdth(out); 
 				}
 				else
 				{
@@ -330,13 +330,13 @@ class PrintLs
 				{
 					for(out = out->subdir; out != NULL; out = out->next)
 					{
-						printHelper(out, colNum, colWdth, curCol, pLongList);
+						printHelper(out, colNum, colWdth, curCol, pLongList, lnkWdth);
 					}
 				}
 				//run this if out is a file
 				else
 				{
-					printHelper(out, colNum, colWdth, curCol, pLongList);
+					printHelper(out, colNum, colWdth, curCol, pLongList, lnkWdth);
 				}
 				if(!pLongList)
 				{
