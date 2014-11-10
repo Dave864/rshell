@@ -76,17 +76,14 @@ void showStat(const char* file, PrintLs & output)
 	memset(mode, '\0', 11);
 	if(S_ISDIR(statBuf.st_mode))
 	{
-		cout << 'd';
 		mode[0] = 'd';
 	}
 	else if(S_ISLNK(statBuf.st_mode))
 	{
-		cout << 'l';
 		mode[0] = 'l';
 	}
 	else
 	{
-		cout << '-';
 		mode[0] = '-';
 	}
 	//user permissions
@@ -101,6 +98,7 @@ void showStat(const char* file, PrintLs & output)
 	mode[7] = (S_IROTH & statBuf.st_mode) ? 'r': '-';
 	mode[8] = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
 	mode[9] = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
+	mode[10] = '\0';
 	output.addL_mode(mode);//class func call
 	//obtains number of hard links
 	output.addL_link(statBuf.st_nlink);//class func call
@@ -149,10 +147,6 @@ void showStat(const char* file, PrintLs & output)
 		}
 	}
 	output.addL_date(mod_time);//class func call
-	//obtains the name of the file
-	string file_name(file);
-	unsigned found = file_name.find_last_of('/');
-	output.addL_name(file_name.substr(found+1).c_str());//class func call
 	return;
 }
 
@@ -238,14 +232,9 @@ void runLS(int flags, string& dirName, PrintLs & output)
 		{
 			showStat(dirName.c_str(), output);
 		}
-		else
-		{
-			cout << dirName << endl;
-		}
 	}
 	else
 	{
-		//**ADD SUB_DIR LIST
 		runOnDir(flags, dirName, output);
 	}
 }

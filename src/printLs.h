@@ -9,14 +9,17 @@ using namespace std;
 //holds information that is displayed when the -l flag is called in ls
 struct Long_list
 {
-	char* mode;
+	char mode[11];
 	int hard_lnk;
 	char* usr;
 	char* grp;
 	int sze;
-	char* date;
-	const char* name;
-	Long_list(int lnk = 0):mode(), hard_lnk(lnk), usr(), grp(), sze(0), date(), name(){}
+	char date[80];
+	Long_list():hard_lnk(0), usr(), grp(), sze(0), date() 
+	{
+		memset(mode, '\0', 11);
+		memset(date, '\0', 80);
+	}
 };
 
 struct Dir
@@ -93,6 +96,41 @@ class PrintLs
 			return len;
 		}
 
+		//helper function for Print
+		void printHelper(Dir* out, int colWdth, int colNum, int& curCol, bool pLongList/*, int lnkWdth*/)
+		{
+			//print in long list format
+			if(pLongList)
+			{
+				cout << out->info->mode << ' '
+					<< out->info->hard_lnk << ' '
+					<< out->info->usr << ' '
+					<< out->info->grp << ' '
+					/*<< setw(lnkWdth) << right*/ << out->info->sze << ' '
+					<< out->info->date << ' '
+					<< out->name << endl;
+			}
+			//print just the file names
+			else
+			{
+				if(colNum == 0)
+				{
+					cout << out->name << "  ";
+				}
+				else
+				{
+					if(curCol == colNum)
+					{
+						cout << endl;
+						curCol = 0;
+					}
+					cout.width(colWdth+1);
+					cout << left << out->name << setfill(' ') << ' ';
+					curCol++;
+				}
+			}
+		}
+
 	public:
 		PrintLs():first(NULL), cur(NULL), curSub(NULL){}
 		void addDir(string& dir)
@@ -133,14 +171,14 @@ class PrintLs
 				{
 					curSub->info = new Long_list();
 				}
-				curSub->info->mode = mode;
+				strcpy(curSub->info->mode, mode);
 				return;
 			}
 			if(cur->info == NULL)
 			{
 				cur->info= new Long_list();
 			}
-			cur->info->mode = mode;
+			strcpy(cur->info->mode, mode);
 		}
 
 		//add number of links long list info to current node
@@ -154,14 +192,18 @@ class PrintLs
 			{
 				if(curSub->info == NULL)
 				{
-					curSub->info = new Long_list(numL);
+					curSub->info = new Long_list();
 				}
+				curSub->info->hard_lnk = numL;
 				return;
 			}
 			if(cur->info == NULL)
 			{
-				cur->info= new Long_list(numL);
+				cur->info= new Long_list();
+				cur->info->hard_lnk = numL;
+				return;
 			}
+			cur->info->hard_lnk = numL;
 		}
 
 		//add group name long list info to current node
@@ -246,51 +288,36 @@ class PrintLs
 				{
 					curSub->info = new Long_list();
 				}
-				curSub->info->date= date;
+				strcpy(curSub->info->date, date);
 				return;
 			}
 			if(cur->info == NULL)
 			{
 				cur->info= new Long_list();
 			}
-			cur->info->date = date;
-		}
-
-		//add name long list info to current node
-		void addL_name(const char* name)
-		{
-			if(first == NULL)
-			{
-				return;
-			}
-			if(curSub != NULL)
-			{
-				if(curSub->info == NULL)
-				{
-					curSub->info = new Long_list();
-				}
-				curSub->info->name = name;
-				return;
-			}
-			if(cur->info == NULL)
-			{
-				cur->info= new Long_list();
-			}
-			cur->info->name = name;
+			strcpy(cur->info->date, date);
 		}
 
 		void Print()
 		{
-			int lnkWdth = 0;
+			//int lnkWdth = 0;
 			int colWdth = 0;
 			Dir* out = first;
-			//print contents of current directory
+			//Run this if up to one non-flag argument was passed
 			if(out->next == NULL)
 			{
-				bool pLongList = (out->subdir->info != NULL) ? true: false;
+				bool pLongList; 
+				if(out->subdir == NULL)
+				{
+					pLongList = (out->info != NULL) ? true: false;
+				}
+				else
+				{
+					pLongList = (out->subdir->info != NULL) ? true: false;
+				}
 				if(pLongList)
 				{
-					lnkWdth = subDirLnkWdth(out); 
+					//lnkWdth = subDirLnkWdth(out); 
 				}
 				else
 				{
@@ -298,45 +325,25 @@ class PrintLs
 				}
 				int colNum = (colWdth == 0) ? 0: BUF_WIDTH/colWdth;
 				int curCol = 0;
-				for(out = out->subdir; out != NULL; out = out->next)
+				//Run this if out is a directory
+				if(out->subdir != NULL)
 				{
-					//print in long list format
-					if(pLongList)
+					for(out = out->subdir; out != NULL; out = out->next)
 					{
-						cout << out->info->mode << ' '
-							<< out->info->hard_lnk << ' '
-							<< out->info->usr << ' '
-							<< out->info->grp << ' '
-							<< setw(lnkWdth) << right << out->info->sze << ' '
-							<< out->info->date << ' '
-							<< out->info->name << endl;
+						printHelper(out, colNum, colWdth, curCol, pLongList);
 					}
-					//print just the file names
-					else
-					{
-						if(colNum == 0)
-						{
-							cout << out->name << "  ";
-						}
-						else
-						{
-							if(curCol == colNum)
-							{
-								cout << endl;
-								curCol = 0;
-							}
-							cout.width(colWdth+1);
-							cout << left << out->name << setfill(' ') << ' ';
-							curCol++;
-						}
-					}
+				}
+				//run this if out is a file
+				else
+				{
+					printHelper(out, colNum, colWdth, curCol, pLongList);
 				}
 				if(!pLongList)
 				{
 					cout << endl;
 				}
 			}
-			//print contents of arguments passed via command line
+			//print contents of two or more non-flag arguments passed
 			else
 			{
 			}
