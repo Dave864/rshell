@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <queue>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -99,9 +100,9 @@ void showStat(const char* file, PrintLs & output)
 	mode[8] = (S_IWOTH & statBuf.st_mode) ? 'w': '-';
 	mode[9] = (S_IXOTH & statBuf.st_mode) ? 'x': '-';
 	mode[10] = '\0';
-	output.addL_mode(mode);//class func call
+	output.addL_mode(mode);
 	//obtains number of hard links
-	output.addL_link(statBuf.st_nlink);//class func call
+	output.addL_link(statBuf.st_nlink);
 	//obtains owner name
 	struct passwd *pw; 
 	errno = 0;
@@ -113,7 +114,7 @@ void showStat(const char* file, PrintLs & output)
 			exit(1);
 		}
 	}
-	output.addL_usr(pw->pw_name);//class func call
+	output.addL_usr(pw->pw_name);
 	//obtains group name
 	struct group *gr;
 	errno = 0;
@@ -125,9 +126,9 @@ void showStat(const char* file, PrintLs & output)
 			exit(1);
 		}
 	}
-	output.addL_grp(gr->gr_name);//class func call
+	output.addL_grp(gr->gr_name);
 	//obtains the size in bytes
-	output.addL_sze(statBuf.st_size);//class func call
+	output.addL_sze(statBuf.st_size);
 	//obtains the last modified time
 	time_t tm = statBuf.st_mtime;
 	struct tm time;
@@ -146,13 +147,96 @@ void showStat(const char* file, PrintLs & output)
 			exit(1);
 		}
 	}
-	output.addL_date(mod_time);//class func call
+	output.addL_date(mod_time);
 	return;
 }
 
 //recursively displays the contents of all directories and their subdirectories
 void runLS_R(int flags, string dirName)
 {
+	queue<char*> subDirs;
+	struct stat statBuf;
+	if(stat(dirName.c_str(), &statBuf) == -1)
+	{
+		perror("stat");
+		exit(1);
+	}
+	if(S_ISDIR(statBuf.st_mode))
+	{
+		DIR* dirp = opendir(dirName.c_str());
+		if(dirp == NULL)
+		{
+			perror("opendir");
+			exit(1);
+		}
+		string file = dirName;
+		dirent* direntp;
+		errno = 0;
+		while((direntp = readdir(dirp)) != NULL)
+		{
+			//if flag -a is set, display hidden files
+			if(flags & FLAG_A)
+			{
+				if(stat(direntp->d_name, &statBuf) == -1)
+				{
+					perror("stat");
+					exit(1);
+				}
+				if(S_ISDIR(statBuf.st_mode))
+				{
+					subDirs.push(direntp->d_name);
+				}
+				else
+				{
+					if(flags & FLAG_L)
+					{
+						addPath(file, direntp->d_name);
+						//showStat(file.c_str(), output);
+						file = dirName;
+					}
+				}
+			}
+			else
+			{
+				if(direntp->d_name[0] != '.')
+				{
+					if(stat(direntp->d_name, &statBuf) == -1)
+					{
+						perror("stat");
+						exit(1);
+					}
+					if(S_ISDIR(statBuf.st_mode))
+					{
+						subDirs.push(direntp->d_name);
+					}
+					else
+					{
+						if(flags & FLAG_L)
+						{
+							addPath(file, direntp->d_name);
+							//showStat(file.c_str(), output);
+							file = dirName;
+						}
+					}
+				}
+			}
+		}
+		if(errno != 0)
+		{
+			perror("readdir");
+			exit(1);
+		}
+		if(closedir(dirp) == -1)
+		{
+			perror("closedir");
+			exit(1);
+		}
+		for(;!subDirs.empty(); subDirs.pop())
+		{
+			//recursive call
+			cout << subDirs.front() << endl;
+		}
+	}
 	return;
 }
 
@@ -176,13 +260,13 @@ void runOnDir(int flags, string& dirName, PrintLs & output)
 			if(flags & FLAG_L)
 			{
 				addPath(file, direntp->d_name);
-				output.addSubDir(direntp->d_name);//class func call
+				output.addSubDir(direntp->d_name);
 				showStat(file.c_str(), output);
 				file = dirName;
 			}
 			else
 			{
-				output.addSubDir(direntp->d_name);//class func call
+				output.addSubDir(direntp->d_name);
 			}
 		}
 		else
@@ -192,13 +276,13 @@ void runOnDir(int flags, string& dirName, PrintLs & output)
 				if(flags & FLAG_L)
 				{
 					addPath(file, direntp->d_name);
-					output.addSubDir(direntp->d_name);//class func call
+					output.addSubDir(direntp->d_name);
 					showStat(file.c_str(), output);
 					file = dirName;
 				}
 				else
 				{
-					output.addSubDir(direntp->d_name);//class func call
+					output.addSubDir(direntp->d_name);
 				}
 			}
 		}
