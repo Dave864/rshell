@@ -60,7 +60,10 @@ class PrintLs
 			unsigned int len = 0;
 			for(cur = first; cur->next != NULL; cur = cur->next)
 			{
-				len = (strlen(cur->name.c_str()) > len) ? strlen(cur->name.c_str()): len;
+				if(cur->subdir == NULL)
+				{
+					len = (strlen(cur->name.c_str()) > len) ? strlen(cur->name.c_str()): len;
+				}
 			}
 			return len;
 		}
@@ -90,10 +93,34 @@ class PrintLs
 			unsigned int cnt;
 			for(cur = first; cur->next != NULL; cur = cur->next)
 			{
-				cnt = static_cast<int>(log10(cur->info->sze)+1);
-				len = (cnt > len) ? cnt: len;
+				if(cur->subdir == NULL)
+				{
+					cnt = static_cast<int>(log10(cur->info->sze)+1);
+					len = (cnt > len) ? cnt: len;
+				}
 			}
 			return len;
+		}
+
+		//obatains info needed for Print to format the output
+		void formatInfo(bool& pLongList, int& lnkWdth, int& colWdth, Dir* out, bool multCom)
+		{
+				if(out->subdir == NULL)
+				{
+					pLongList = (out->info != NULL) ? true: false;
+				}
+				else
+				{
+					pLongList = (out->subdir->info != NULL) ? true: false;
+				}
+				if(pLongList)
+				{
+					lnkWdth = (multCom) ? dirLnkWdth() :subDirLnkWdth(out); 
+				}
+				else
+				{
+					colWdth = (multCom) ? dirColWdth() :subDirColWdth(out);
+				}
 		}
 
 		//helper function for Print
@@ -125,7 +152,7 @@ class PrintLs
 						curCol = 0;
 					}
 					cout.width(colWdth+1);
-					cout << left << out->name << setfill(' ') << ' ';
+					cout << left << out->name << setfill(' ') << "  ";
 					curCol++;
 				}
 			}
@@ -307,22 +334,7 @@ class PrintLs
 			if(out->next == NULL)
 			{
 				bool pLongList; 
-				if(out->subdir == NULL)
-				{
-					pLongList = (out->info != NULL) ? true: false;
-				}
-				else
-				{
-					pLongList = (out->subdir->info != NULL) ? true: false;
-				}
-				if(pLongList)
-				{
-					lnkWdth = subDirLnkWdth(out); 
-				}
-				else
-				{
-					colWdth = subDirColWdth(out);
-				}
+				formatInfo(pLongList, lnkWdth, colWdth, out, false);
 				int colNum = (colWdth == 0) ? 0: BUF_WIDTH/colWdth;
 				int curCol = 0;
 				//Run this if out is a directory
@@ -343,9 +355,37 @@ class PrintLs
 					cout << endl;
 				}
 			}
-			//print contents of two or more non-flag arguments passed
+			//Run this if two or more non-flag arguments passed
 			else
 			{
+				bool pLongList; 
+				formatInfo(pLongList, lnkWdth, colWdth, out, true);
+				int colNum = (colWdth == 0) ? 0: BUF_WIDTH/colWdth;
+				int curCol = 0;
+				//find and print out files
+				for(; out != NULL; out = out->next)
+				{
+					if(out->subdir == NULL)
+					{
+						printHelper(out, colNum, colWdth, curCol, pLongList, lnkWdth);
+					}
+				}
+				//find and print out contents of subdirectories
+				for(out = first; out != NULL; out = out->next)
+				{
+					if(out->subdir != NULL)
+					{
+						cout << endl << out->name << ":\n";
+						for(Dir* tmp = out->subdir; tmp != NULL; tmp = tmp->next)
+						{
+							printHelper(tmp, colNum, colWdth, curCol, pLongList, lnkWdth);
+						}
+					}
+				}
+				if(!pLongList)
+				{
+					cout << endl;
+				}
 			}
 		}
 
