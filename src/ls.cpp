@@ -177,30 +177,12 @@ void runLS_R(int flags, string dirName)
 			//if flag -a is set, display hidden files
 			if(flags & FLAG_A)
 			{
-				if(stat(direntp->d_name, &statBuf) == -1)
+				file = direntp->d_name;
+				if((file != ".") && (file != ".."))
 				{
-					perror("stat");
-					exit(1);
-				}
-				if(S_ISDIR(statBuf.st_mode))
-				{
-					subDirs.push(direntp->d_name);
-				}
-				else
-				{
-					if(flags & FLAG_L)
-					{
-						addPath(file, direntp->d_name);
-						//showStat(file.c_str(), output);
-						file = dirName;
-					}
-				}
-			}
-			else
-			{
-				if(direntp->d_name[0] != '.')
-				{
-					if(stat(direntp->d_name, &statBuf) == -1)
+					file = dirName;
+					addPath(file, direntp->d_name);
+					if(stat(file.c_str(), &statBuf) == -1)
 					{
 						perror("stat");
 						exit(1);
@@ -213,11 +195,34 @@ void runLS_R(int flags, string dirName)
 					{
 						if(flags & FLAG_L)
 						{
-							addPath(file, direntp->d_name);
 							//showStat(file.c_str(), output);
-							file = dirName;
 						}
 					}
+					file = dirName;
+				}
+			}
+			else
+			{
+				if(direntp->d_name[0] != '.')
+				{
+					addPath(file, direntp->d_name);
+					if(stat(file.c_str(), &statBuf) == -1)
+					{
+						perror("stat");
+						exit(1);
+					}
+					if(S_ISDIR(statBuf.st_mode))
+					{
+						subDirs.push(direntp->d_name);
+					}
+					else
+					{
+						if(flags & FLAG_L)
+						{
+							//showStat(file.c_str(), output);
+						}
+					}
+					file = dirName;
 				}
 			}
 		}
@@ -231,12 +236,16 @@ void runLS_R(int flags, string dirName)
 			perror("closedir");
 			exit(1);
 		}
+		cout << dirName << ":\n";
 		for(;!subDirs.empty(); subDirs.pop())
 		{
 			//recursive call
-			cout << subDirs.front() << endl;
+			addPath(file, subDirs.front());
+			runLS_R(flags, file);
+			file = dirName;
 		}
 	}
+	cerr << "back\n";
 	return;
 }
 
