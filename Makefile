@@ -1,12 +1,12 @@
 CFLAGS=-g -Wall -Werror -pedantic -ansi
 BIN="bin"
 
-all: src/printLs.h
+all: src/printLs.h src/my_queue.h
 	mkdir -p $(BIN)
 	cd bin; g++ ../src/main.cpp $(CFLAGS) -o rshell
 	cd bin; g++ ../src/ls.cpp $(CFLAGS) -o ls
 
-ls: src/printLs.h
+ls: src/printLs.h src/my_queue.h
 	mkdir -p $(BIN)
 	cd bin; g++ ../src/ls.cpp $(CFLAGS) -o ls
 

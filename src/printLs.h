@@ -4,6 +4,8 @@
 #include <string.h>
 using namespace std;
 
+#ifndef __PRINTLS_H__
+#define __PRINTLS_H__
 #define BUF_WIDTH 80
 
 //holds information that is displayed when the -l flag is called in ls
@@ -380,6 +382,7 @@ class PrintLs
 						{
 							printHelper(tmp, colNum, colWdth, curCol, pLongList, lnkWdth);
 						}
+						cout << endl;
 					}
 				}
 				if(!pLongList)
@@ -408,3 +411,4 @@ class PrintLs
 			}
 		}
 };
+#endif

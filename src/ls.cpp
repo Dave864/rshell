@@ -156,6 +156,8 @@ void showStat(const char* file, PrintLs & output)
 void runLS_R(int flags, string dirName)
 {
 	My_queue subDir;
+	PrintLs output_R;
+	output_R.addDir(dirName);
 	struct stat statBuf;
 	if(stat(dirName.c_str(), &statBuf) == -1)
 	{
@@ -191,12 +193,18 @@ void runLS_R(int flags, string dirName)
 					if(S_ISDIR(statBuf.st_mode))
 					{
 						subDir.push(direntp->d_name);
+						output_R.addSubDir(direntp->d_name);
+						if(flags & FLAG_L)
+						{
+							showStat(file.c_str(), output_R);
+						}
 					}
 					else
 					{
+						output_R.addSubDir(direntp->d_name);
 						if(flags & FLAG_L)
 						{
-							//showStat(file.c_str(), output);
+							showStat(file.c_str(), output_R);
 						}
 					}
 					file = dirName;
@@ -215,12 +223,18 @@ void runLS_R(int flags, string dirName)
 					if(S_ISDIR(statBuf.st_mode))
 					{
 						subDir.push(direntp->d_name);
+						output_R.addSubDir(direntp->d_name);
+						if(flags & FLAG_L)
+						{
+							showStat(file.c_str(), output_R);
+						}
 					}
 					else
 					{
+						output_R.addSubDir(direntp->d_name);
 						if(flags & FLAG_L)
 						{
-							//showStat(file.c_str(), output);
+							showStat(file.c_str(), output_R);
 						}
 					}
 					file = dirName;
@@ -238,6 +252,8 @@ void runLS_R(int flags, string dirName)
 			exit(1);
 		}
 		cout << dirName << ":\n";
+		output_R.Print();
+		cout << endl;
 		for(;!subDir.empty(); subDir.pop())
 		{
 			//recursive call
@@ -246,7 +262,10 @@ void runLS_R(int flags, string dirName)
 			file = dirName;
 		}
 	}
-	cerr << "back\n";
+	else
+	{
+		output_R.Print();
+	}
 	return;
 }
 
