@@ -13,6 +13,7 @@
 #include <grp.h>
 #include <errno.h>
 #include "printLs.h"
+#include "my_queue.h"
 using namespace std;
 
 #define FLAG_A 1
@@ -41,7 +42,7 @@ void checkFlags(int & flags, int argc, char** argv)
 }
 
 //adds destination to the end of the path 
-void addPath(string& path, char* destination)
+void addPath(string& path, const char* destination)
 {
 	//does not add destination if it is a flag
 	if(destination[0] == '-')
@@ -154,7 +155,7 @@ void showStat(const char* file, PrintLs & output)
 //recursively displays the contents of all directories and their subdirectories
 void runLS_R(int flags, string dirName)
 {
-	queue<char*> subDirs;
+	My_queue subDir;
 	struct stat statBuf;
 	if(stat(dirName.c_str(), &statBuf) == -1)
 	{
@@ -189,7 +190,7 @@ void runLS_R(int flags, string dirName)
 					}
 					if(S_ISDIR(statBuf.st_mode))
 					{
-						subDirs.push(direntp->d_name);
+						subDir.push(direntp->d_name);
 					}
 					else
 					{
@@ -213,7 +214,7 @@ void runLS_R(int flags, string dirName)
 					}
 					if(S_ISDIR(statBuf.st_mode))
 					{
-						subDirs.push(direntp->d_name);
+						subDir.push(direntp->d_name);
 					}
 					else
 					{
@@ -237,10 +238,10 @@ void runLS_R(int flags, string dirName)
 			exit(1);
 		}
 		cout << dirName << ":\n";
-		for(;!subDirs.empty(); subDirs.pop())
+		for(;!subDir.empty(); subDir.pop())
 		{
 			//recursive call
-			addPath(file, subDirs.front());
+			addPath(file, subDir.front());
 			runLS_R(flags, file);
 			file = dirName;
 		}
