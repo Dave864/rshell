@@ -17,11 +17,13 @@ when they are passed through the command line.
 ####Compiling and Running
 
 To compile specifically this program use the command
+
 ----
 make ls
 ----
 
 To run the command after it has been compiled run the command
+
 ----
 bin/ls #optional: files -flags
 ----
@@ -32,5 +34,6 @@ bin/ls #optional: files -flags
 * When displaying the contents of a file, the output is arranged into columns whose
 width is that of the size of the longest name, regardless if the output would occupy
 more than one line.
+
 **When the sizes of the file names are large, the names may sometimes overflow into the
 next line.
