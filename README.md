@@ -32,3 +32,5 @@ width is that of the size of the longest name, regardless if the output would oc
 more than one line.
 * When the sizes of the file names are large, the names may sometimes overflow into the
 next line.
+*If an argument does not exist, the program will not run, even if any other argument passed in
+does exist
