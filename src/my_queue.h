@@ -18,15 +18,17 @@ struct str
 class My_queue
 {
 	struct str* top;
+	int sz;
 
 	public:
-		My_queue(): top(NULL){};
+		My_queue():top(NULL), sz(0){};
 
 		void push(const char* toAdd)
 		{
 			if(this->empty())
 			{
 				top = new str(toAdd);
+				sz++;
 				return;
 			}
 			for(struct str* tmp = top; tmp != NULL; tmp = tmp->nxt)
@@ -34,45 +36,51 @@ class My_queue
 				if(tmp->nxt == NULL)
 				{
 					tmp->nxt = new str(toAdd);
+					sz++;
 					return;
 				}
-			}
-		}
+			} }
 
 		void pop()
-		{
-			if(!this->empty())
+		{ 
+			if(!this->empty()) 
 			{
 				struct str* tmp = top;
-				top = top->nxt;
-				delete tmp;
-			}
+				top = top->nxt; 
+				sz--; 
+				delete tmp; 
+			} 
 		}
 
-		bool empty()
-		{
-			return (top == NULL);
+		bool empty() 
+		{ 
+			return (top == NULL); 
 		}
 
-		const char* front()
-		{
-			if(this->empty())
+		const char* front() 
+		{ 
+			if(this->empty()) 
+			{ 
+				return '\0'; 
+			} 
+			else 
 			{
-				return '\0';
-			}
-			else
-			{
-				return top->word;
-			}
+				return top->word; 
+			} 
 		}
 
-		~My_queue()
+		int size() 
+		{ 
+			return sz;
+		}
+
+		~My_queue() 
 		{
-			while(!this->empty())
-			{
-				this->pop();
+			while(!this->empty()) 
+			{ 
+				this->pop(); 
 			}
-			delete top;
+			delete top; 
 		}
 };
 #endif

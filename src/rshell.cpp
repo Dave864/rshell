@@ -3,6 +3,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include "my_queue.h"
 using namespace std;
 
 #define C_NEXT ";"
@@ -30,17 +34,61 @@ bool ExitFound(string input)
 	return true;
 }
 
-//creates a char** object from a char* for use by execvp
-void GetCom(char** command, const char* input)
+//puts elmts into command
+void Insert(My_queue& elmts, char* command[])
 {
+	int sz = elmts.size();
+	for(int i = 0; i < sz; i++)
+	{
+		command[i] = new char[BUFSIZ];
+		strcpy(command[i], elmts.front());
+		elmts.pop();
+	}
+}
+
+//extracts all whitespace seperated substrings from input puts them into
+//an array of char*
+void GetCom(const char* input, char* command[])
+{
+	My_queue elmts;
 	char tmp[BUFSIZ];
+	memset(tmp, '\0', BUFSIZ);
 	strcpy(tmp, input);
 	char* elmt = strtok(tmp, " \t\n\v\f\r");
 	while(elmt != NULL)
 	{
-		//Insert(command, elmt);
+		elmts.push(elmt);
 		elmt = strtok(NULL, " \t\n\v\f\r");
 	}
+	Insert(elmts, command);
+}
+
+//executes command and returns if it did so
+bool Execute(char* command[])
+{
+	int status;
+	pid_t PID;
+	PID = fork()
+	//fork failed
+	if(PID == -1)
+	{
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
+	//child process
+	else if(PID == 0)
+	{
+	}
+	else
+	{
+		PID = wait(&status);
+		if(PID == -1)
+		{
+			perror("wait");
+			exit(EXIT_FAILURE);
+		}
+	}
+	return false;
 }
 
 //sees which connector was invoked and executes the input using that connector
@@ -75,8 +123,14 @@ void RunWCon(string input)
 	}
 	else
 	{
-		char* command[1] = {NULL};
-		GetCom(command, input.c_str());
+		char* command[BUFSIZ];
+		memset(command, '\0', BUFSIZ);
+		GetCom(input.c_str(), command);
+		//free up memory allocated to command
+		for(int j = 0; command[j] != '\0';j++)
+		{
+			delete command[j];
+		}
 	}
 }
 
