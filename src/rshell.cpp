@@ -79,6 +79,11 @@ bool Execute(char* command[])
 	//child process
 	else if(PID == 0)
 	{
+		if(execvp(command[0], command) == -1)
+		{
+			perror("execvp");
+			exit(EXIT_FAILURE);
+		}
 	}
 	else
 	{
@@ -88,8 +93,16 @@ bool Execute(char* command[])
 			perror("wait");
 			exit(EXIT_FAILURE);
 		}
+		if(WIFEXITED(status))
+		{
+			if(WEXITSTATUS(status) > 0)
+			{
+				return true;
+			}
+			return false;
+		}
 	}
-	return false;
+	return true;
 }
 
 //frees up memory used by comArray
@@ -106,7 +119,7 @@ void ParseExecute(string input, const char* cnctr)
 {
 	char* command, *saveptr;
 	char* comArray[BUFSIZ];
-	//bool success;
+	bool success;
 	char tmp[BUFSIZ];
 	memset(tmp,'\0', BUFSIZ);
 	strcpy(tmp, input.c_str());
@@ -115,7 +128,7 @@ void ParseExecute(string input, const char* cnctr)
 	{
 		memset(comArray, '\0', BUFSIZ);
 		GetCom(command, comArray);
-		//success = Execute(comArray);
+		success = Execute(comArray);
 		if(strncmp(cnctr, C_NEXT, strlen(cnctr)) == 0)
 		{
 			FreeMem(comArray);
@@ -123,18 +136,18 @@ void ParseExecute(string input, const char* cnctr)
 		else if(strncmp(cnctr, C_AND, strlen(cnctr)) == 0)
 		{
 			FreeMem(comArray);
-			/*if(!success)
+			if(!success)
 			{
-				cout << "Stop!\n";
-			}*/
+				return;
+			}
 		}
 		else
 		{
 			FreeMem(comArray);
-			/*if(success)
+			if(success)
 			{
-				cout << "Stop!\n";
-			}*/
+				return;
+			}
 		}
 		command = strtok_r(NULL, cnctr, &saveptr);
 	}
@@ -150,7 +163,6 @@ void RunWCon(string input)
 			cerr << "error: connector as first argument\n";
 			return;
 		}
-		//parse input and run each command
 		ParseExecute(input, C_NEXT);
 	}
 	else if(input.find(C_AND) != string::npos)
@@ -160,7 +172,6 @@ void RunWCon(string input)
 			cerr << "error: connector as first argument\n";
 			return;
 		}
-		//parse input and run command if previous also ran
 		ParseExecute(input, C_AND);
 	}
 	else if(input.find(C_OR) != string::npos)
@@ -170,7 +181,6 @@ void RunWCon(string input)
 			cerr << "error: connector as first argument\n";
 			return;
 		}
-		//parse input and run command if previous failed
 		ParseExecute(input, C_OR);
 	}
 	else
@@ -178,7 +188,7 @@ void RunWCon(string input)
 		char* command[BUFSIZ];
 		memset(command, '\0', BUFSIZ);
 		GetCom(input.c_str(), command);
-		//free up memory allocated to command
+		Execute(command);
 		FreeMem(command);
 	}
 }
