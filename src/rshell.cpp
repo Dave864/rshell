@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "my_queue.h"
@@ -68,7 +69,7 @@ bool Execute(char* command[])
 {
 	int status;
 	pid_t PID;
-	PID = fork()
+	PID = fork();
 	//fork failed
 	if(PID == -1)
 	{
@@ -91,6 +92,54 @@ bool Execute(char* command[])
 	return false;
 }
 
+//frees up memory used by comArray
+void FreeMem(char* comArray[])
+{
+	for(int i = 0; comArray[i] != '\0'; i++)
+	{
+		delete comArray[i];
+	}
+}
+
+//gets the commands seperated by the connectors and executes each command
+void ParseExecute(string input, const char* cnctr)
+{
+	char* command, *saveptr;
+	char* comArray[BUFSIZ];
+	//bool success;
+	char tmp[BUFSIZ];
+	memset(tmp,'\0', BUFSIZ);
+	strcpy(tmp, input.c_str());
+	command = strtok_r(tmp, cnctr, &saveptr);
+	while(command != NULL)
+	{
+		memset(comArray, '\0', BUFSIZ);
+		GetCom(command, comArray);
+		//success = Execute(comArray);
+		if(strncmp(cnctr, C_NEXT, strlen(cnctr)) == 0)
+		{
+			FreeMem(comArray);
+		}
+		else if(strncmp(cnctr, C_AND, strlen(cnctr)) == 0)
+		{
+			FreeMem(comArray);
+			/*if(!success)
+			{
+				cout << "Stop!\n";
+			}*/
+		}
+		else
+		{
+			FreeMem(comArray);
+			/*if(success)
+			{
+				cout << "Stop!\n";
+			}*/
+		}
+		command = strtok_r(NULL, cnctr, &saveptr);
+	}
+}
+
 //sees which connector was invoked and executes the input using that connector
 void RunWCon(string input)
 {
@@ -102,6 +151,7 @@ void RunWCon(string input)
 			return;
 		}
 		//parse input and run each command
+		ParseExecute(input, C_NEXT);
 	}
 	else if(input.find(C_AND) != string::npos)
 	{
@@ -111,6 +161,7 @@ void RunWCon(string input)
 			return;
 		}
 		//parse input and run command if previous also ran
+		ParseExecute(input, C_AND);
 	}
 	else if(input.find(C_OR) != string::npos)
 	{
@@ -120,6 +171,7 @@ void RunWCon(string input)
 			return;
 		}
 		//parse input and run command if previous failed
+		ParseExecute(input, C_OR);
 	}
 	else
 	{
@@ -127,10 +179,7 @@ void RunWCon(string input)
 		memset(command, '\0', BUFSIZ);
 		GetCom(input.c_str(), command);
 		//free up memory allocated to command
-		for(int j = 0; command[j] != '\0';j++)
-		{
-			delete command[j];
-		}
+		FreeMem(command);
 	}
 }
 
