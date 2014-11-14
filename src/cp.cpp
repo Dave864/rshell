@@ -69,7 +69,7 @@ void ReadWriteChar(char * source, char * dest)
 		perror("close");
 		exit(1);
 	}
-	if(remove(argv[2]) != 0)
+	if(remove(dest) != 0)
 	{
 		perror("remove");
 	}
@@ -114,7 +114,7 @@ void ReadWriteBuff(char * source, char * dest)
 		perror("close");
 		exit(1);
 	}
-	if(remove(argv[2]) != 0)
+	if(remove(dest) != 0)
 	{
 		perror("remove");
 	}
@@ -147,10 +147,10 @@ bool GetFiles(int argc, char** argv, char* source, char* dest)
 //check if a file exists and if it's a directory
 bool FileExists(char * dest)
 {
-	struct stat statBUf;
+	struct stat statBuf;
 	if(stat(dest, &statBuf) == 0)
 	{
-		if(S_ISDIR(statbuf.st_mode))
+		if(S_ISDIR(statBuf.st_mode))
 		{
 			cerr << "error: Destination is a directory\n";
 		}
@@ -171,9 +171,9 @@ int main(int argc, char ** argv)
 	}
 	char source[128];
 	memset(source, '\0', 128);
-	chr dest[128];
+	char dest[128];
 	memset(dest, '\0', 128);
-	if(GetFiles(arg, argv, source, dest))
+	if(GetFiles(argc, argv, source, dest))
 	{
 		if(FileExists(dest))
 		{
