@@ -25,6 +25,13 @@ void DelComment(string& input)
 	input = input.substr(0, input.find(COMMENT));
 }
 
+//sets up tmp buffer for use in strtok
+void TokSet(char* tmp, string input)
+{
+	memset(tmp, '\0', BUFSIZ);
+	strcpy(tmp, input.c_str());
+}
+
 //returns true if exit was called
 bool ExitFound(string input)
 {
@@ -53,8 +60,7 @@ void GetCom(const char* input, char* command[])
 {
 	My_queue elmts;
 	char tmp[BUFSIZ];
-	memset(tmp, '\0', BUFSIZ);
-	strcpy(tmp, input);
+	TokSet(tmp, input);
 	char* elmt = strtok(tmp, " \t\n\v\f\r");
 	while(elmt != NULL)
 	{
@@ -170,6 +176,76 @@ int FirstRD(string command)
 	return toRet;
 }
 
+//gets the word immediately after the first io redirection command
+string GetFile(string& piece, int pos)
+{
+	unsigned int end_pos = piece.find_first_not_of(" \t\n\v\f\r", pos);
+	for(; !isspace(piece[end_pos]); end_pos++)
+	{
+		if(end_pos == piece.size())
+		{
+			break;
+		}
+		if(piece.compare(end_pos, 1, RD_IN) == 0)
+		{
+			break;
+		}
+		if(piece.compare(end_pos, 1, RD_OUT) == 0)
+		{
+			break;
+		}
+		if(piece.compare(end_pos, 2, RD_OUTAPP) == 0)
+		{
+			break;
+		}
+	}
+	string file = piece.substr(pos, end_pos-pos);
+	size_t sz = end_pos - pos;
+	piece.erase(pos, sz);
+	return file;
+}
+
+//runs the IO redirection commands and piping
+void IORedir(string input)
+{
+	char* piece, *saveptr;
+	int pos, com;
+	string piece_str, file;
+	char tmp[BUFSIZ];
+	TokSet(tmp, input);
+	piece = strtok_r(tmp, PIPE, &saveptr);
+	while(piece != NULL)
+	{
+		piece_str = piece;
+		while((com = FirstRD(piece_str)) != -1)
+		{
+			switch(com)
+			{
+				case 0:
+					cout << "Run input redirection\n";
+					pos = piece_str.find(RD_IN);
+					file = GetFile(piece_str, pos+1);
+					cout << "file to redirect input to: " << file << endl;
+					piece_str.erase(pos, 1);
+					cout << "piece is now: " << piece_str << endl;
+					cout << "___________________________________________\n";
+					break;
+				case 1:
+					cout << "Run output redirection\n";
+					break;
+				case 2:
+					cout << "Run output append redirection\n";
+					break;
+				default:
+					cout << "Run the command\n";
+					break;
+			}
+		}
+		cout << endl;
+		piece = strtok_r(NULL, PIPE, &saveptr);
+	}
+}
+
 //gets the commands seperated by the connectors and executes each command
 void ParseExecute(string input, const char* cnctr)
 {
@@ -177,8 +253,7 @@ void ParseExecute(string input, const char* cnctr)
 	char* comArray[BUFSIZ];
 	bool success;
 	char tmp[BUFSIZ];
-	memset(tmp,'\0', BUFSIZ);
-	strcpy(tmp, input.c_str());
+	TokSet(tmp, input);
 	command = strtok_r(tmp, cnctr, &saveptr);
 	while(command != NULL)
 	{
@@ -247,13 +322,13 @@ void RunWCon(string input)
 		GetCom(input.c_str(), command);
 		if(FirstRD(input) > -1)
 		{
-			cout << "Conduct output redirection\n";
+			IORedir(input);
 		}
 		else
 		{
 			Execute(command);
-			FreeMem(command);
 		}
+		FreeMem(command);
 	}
 }
 
