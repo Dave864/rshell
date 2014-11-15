@@ -151,7 +151,7 @@ int FirstRD(string command)
 		if(pos != -1)
 		{
 			pos = (pos > tmp)? tmp: pos;
-			toRet = 2;
+			toRet = (pos != tmp)? 1: 2;
 		}
 		else
 		{
@@ -176,7 +176,8 @@ int FirstRD(string command)
 	return toRet;
 }
 
-//gets the word immediately after the first io redirection command
+//gets the word immediately after the first io redirection command and removes
+//it from piece
 string GetFile(string& piece, int pos)
 {
 	unsigned int end_pos = piece.find_first_not_of(" \t\n\v\f\r", pos);
@@ -224,17 +225,35 @@ void IORedir(string input)
 				case 0:
 					cout << "Run input redirection\n";
 					pos = piece_str.find(RD_IN);
+					//get file for stdin redirection and remove file from piece_str
 					file = GetFile(piece_str, pos+1);
 					cout << "file to redirect input to: " << file << endl;
+					//remove RD_IN flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
 					cout << "piece is now: " << piece_str << endl;
 					cout << "___________________________________________\n";
 					break;
 				case 1:
 					cout << "Run output redirection\n";
+					pos = piece_str.find(RD_OUT);
+					//get file for stdin redirection and remove file from piece_str
+					file = GetFile(piece_str, pos+1);
+					cout << "file to redirect input to: " << file << endl;
+					//remove RD_OUT flag from piece_str for use in execvp
+					piece_str.erase(pos, 1);
+					cout << "piece is now: " << piece_str << endl;
+					cout << "___________________________________________\n";
 					break;
 				case 2:
 					cout << "Run output append redirection\n";
+					pos = piece_str.find(RD_OUTAPP);
+					//get file for stdin redirection and remove file from piece_str
+					file = GetFile(piece_str, pos+1);
+					cout << "file to redirect input to: " << file << endl;
+					//remove RD_OUTAPP flag from piece_str for use in execvp
+					piece_str.erase(pos, 1);
+					cout << "piece is now: " << piece_str << endl;
+					cout << "___________________________________________\n";
 					break;
 				default:
 					cout << "Run the command\n";
