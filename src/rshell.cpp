@@ -97,12 +97,12 @@ bool Execute(char* command[])
 		{
 			if(WEXITSTATUS(status) > 0)
 			{
-				return true;
+				return false;
 			}
-			return false;
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 //frees up memory used by comArray
