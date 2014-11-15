@@ -114,6 +114,62 @@ void FreeMem(char* comArray[])
 	}
 }
 
+//finds out which redirection command appears first
+int FirstRD(string command)
+{
+	int pos = -1, toRet = -1;
+	int tmp;
+	tmp = command.find(RD_IN);
+	if(tmp != -1)
+	{
+		pos = tmp;
+		toRet = 0;
+	}
+	tmp = command.find(RD_OUT);
+	if(tmp != -1)
+	{
+		if(pos != -1)
+		{
+			pos = (pos > tmp)? tmp: pos;
+			toRet = 1;
+		}
+		else
+		{
+			pos = tmp;
+			toRet = (toRet == -1)? 1: toRet;
+		}
+	}
+	tmp = command.find(RD_OUTAPP);
+	if(tmp != -1)
+	{
+		if(pos != -1)
+		{
+			pos = (pos > tmp)? tmp: pos;
+			toRet = 2;
+		}
+		else
+		{
+			pos = tmp;
+			toRet = (toRet == -1)? 2: toRet;
+		}
+	}
+	tmp = command.find(PIPE);
+	if(tmp != -1)
+	{
+		if(pos != -1)
+		{
+			pos = (pos > tmp)? tmp: pos;
+			toRet = 3;
+		}
+		else
+		{
+			pos = tmp;
+			toRet = (toRet == -1)? 3: toRet;
+		}
+	}
+	return toRet;
+}
+
 //gets the commands seperated by the connectors and executes each command
 void ParseExecute(string input, const char* cnctr)
 {
@@ -128,6 +184,7 @@ void ParseExecute(string input, const char* cnctr)
 	{
 		memset(comArray, '\0', BUFSIZ);
 		GetCom(command, comArray);
+		//check for redirection and run if it exists
 		success = Execute(comArray);
 		if(strncmp(cnctr, C_NEXT, strlen(cnctr)) == 0)
 		{
@@ -188,14 +245,20 @@ void RunWCon(string input)
 		char* command[BUFSIZ];
 		memset(command, '\0', BUFSIZ);
 		GetCom(input.c_str(), command);
-		Execute(command);
-		FreeMem(command);
+		if(FirstRD(input) > -1)
+		{
+			cout << "Conduct output redirection\n";
+		}
+		else
+		{
+			Execute(command);
+			FreeMem(command);
+		}
 	}
 }
 
 int main()
 {
-	//declare all variables to be used in the rshell loop here
 	string input;
 	while(1)
 	{
