@@ -125,12 +125,14 @@ int FirstRD(string command)
 {
 	int pos = -1, toRet = -1;
 	int tmp;
+	//check for input redirection
 	tmp = command.find(RD_IN);
 	if(tmp != -1)
 	{
 		pos = tmp;
 		toRet = 0;
 	}
+	//check for output redirection
 	tmp = command.find(RD_OUT);
 	if(tmp != -1)
 	{
@@ -145,6 +147,7 @@ int FirstRD(string command)
 			toRet = (toRet == -1)? 1: toRet;
 		}
 	}
+	//check for output append redirection
 	tmp = command.find(RD_OUTAPP);
 	if(tmp != -1)
 	{
@@ -159,6 +162,7 @@ int FirstRD(string command)
 			toRet = (toRet == -1)? 2: toRet;
 		}
 	}
+	//check for pipe
 	tmp = command.find(PIPE);
 	if(tmp != -1)
 	{
@@ -223,44 +227,30 @@ void IORedir(string input)
 			switch(com)
 			{
 				case 0:
-					cout << "Run input redirection\n";
 					pos = piece_str.find(RD_IN);
 					//get file for stdin redirection and remove file from piece_str
 					file = GetFile(piece_str, pos+1);
-					cout << "file to redirect input to: " << file << endl;
 					//remove RD_IN flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
-					cout << "piece is now: " << piece_str << endl;
-					cout << "___________________________________________\n";
 					break;
 				case 1:
-					cout << "Run output redirection\n";
 					pos = piece_str.find(RD_OUT);
 					//get file for stdin redirection and remove file from piece_str
 					file = GetFile(piece_str, pos+1);
-					cout << "file to redirect input to: " << file << endl;
 					//remove RD_OUT flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
-					cout << "piece is now: " << piece_str << endl;
-					cout << "___________________________________________\n";
 					break;
 				case 2:
-					cout << "Run output append redirection\n";
 					pos = piece_str.find(RD_OUTAPP);
 					//get file for stdin redirection and remove file from piece_str
 					file = GetFile(piece_str, pos+1);
-					cout << "file to redirect input to: " << file << endl;
 					//remove RD_OUTAPP flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
-					cout << "piece is now: " << piece_str << endl;
-					cout << "___________________________________________\n";
 					break;
 				default:
-					cout << "Run the command\n";
 					break;
 			}
 		}
-		cout << endl;
 		piece = strtok_r(NULL, PIPE, &saveptr);
 	}
 }
