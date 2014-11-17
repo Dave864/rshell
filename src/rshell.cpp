@@ -1,11 +1,14 @@
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include "my_queue.h"
 using namespace std;
@@ -223,6 +226,7 @@ string GetFile(string& piece, int pos)
 	file = piece.substr(pos, end_pos-pos);
 	size_t sz = end_pos - pos;
 	piece.erase(pos, sz);
+	file.erase(0, file.find_first_not_of(" \t\n\v\f\r"));
 	return file;
 }
 
@@ -230,7 +234,7 @@ string GetFile(string& piece, int pos)
 void IORedir(string input)
 {
 	char* piece, *saveptr;
-	int pos, com, std_in, std_out;
+	int pos, com, std_in, std_out, file_in, file_out;
 	string piece_str, file;
 	char tmp[BUFSIZ];
 	TokSet(tmp, input);
@@ -248,6 +252,20 @@ void IORedir(string input)
 			perror("dup");
 			exit(EXIT_FAILURE);
 		}
+		if(close(0) == -1)
+		{
+			perror("close");
+			return;
+			//exit(EXIT_FAILURE);
+		}
+		if(close(1) == -1)
+		{
+			perror("close");
+			return;
+			//exit(EXIT_FAILURE);
+		}
+		file_in = -1;
+		file_out = -1;
 		while((com = FirstRD(piece_str)) != -1)
 		{
 			switch(com)
@@ -268,13 +286,12 @@ void IORedir(string input)
 					}
 					//remove RD_IN flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
-					/*if(close(0) == -1)
+					//redirect stdin
+					if((file_in = open(file.c_str(), O_RDONLY)) == -1)
 					{
-						perror("close");
+						perror("open");
 						return;
-						//exit(EXIT_FAILURE);
 					}
-					*///redirect stdin
 					break;
 				case 1:
 					pos = piece_str.find(RD_OUT);
@@ -292,13 +309,12 @@ void IORedir(string input)
 					}
 					//remove RD_OUT flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
-					/*if(close(1) == -1)
+					//redirect stdout
+					if((file_out = creat(file.c_str(), O_RDONLY)) == -1)
 					{
-						perror("close");
+						perror("creat");
 						return;
-						//exit(EXIT_FAILURE);
 					}
-					*///redirect stdout
 					break;
 				case 2:
 					pos = piece_str.find(RD_OUTAPP);
@@ -316,13 +332,12 @@ void IORedir(string input)
 					}
 					//remove RD_OUTAPP flag from piece_str for use in execvp
 					piece_str.erase(pos, 2);
-					/*if(close(1) == -1)
+					//redirect stdout
+					if((file_out = open(file.c_str(), O_CREAT|O_RDONLY)) == -1)
 					{
-						perror("close");
+						perror("open");
 						return;
-						//exit(EXIT_FAILURE);
 					}
-					*///redirect stdout
 					break;
 				default:
 					break;
@@ -333,22 +348,22 @@ void IORedir(string input)
 		if(dup2(std_in, 0) == -1)
 		{
 			perror("dup2");
-			exit(EXIT_FAILURE);
+			return;
 		}
 		if(dup2(std_out, 1) == -1)
 		{
 			perror("dup2");
-			exit(EXIT_FAILURE);
+			return;
 		}
 		if(close(std_in) == -1)
 		{
 			perror("close");
-			exit(EXIT_FAILURE);
+			return;
 		}
 		if(close(std_out) == -1)
 		{
 			perror("close");
-			exit(EXIT_FAILURE);
+			return;
 		}
 		piece = strtok_r(NULL, PIPE, &saveptr);
 	}
