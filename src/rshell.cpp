@@ -234,7 +234,8 @@ string GetFile(string& piece, int pos)
 void IORedir(string input)
 {
 	char* piece, *saveptr;
-	int pos, com, std_in, std_out, file_in, file_out;
+	char* command[BUFSIZ];
+	int pos, com, file_in, file_out;
 	string piece_str, file;
 	char tmp[BUFSIZ];
 	TokSet(tmp, input);
@@ -242,28 +243,6 @@ void IORedir(string input)
 	while(piece != NULL)
 	{
 		piece_str = piece;
-		if((std_in = dup(0)) == -1)
-		{
-			perror("dup");
-			exit(EXIT_FAILURE);
-		}
-		if((std_out = dup(1)) == -1)
-		{
-			perror("dup");
-			exit(EXIT_FAILURE);
-		}
-		if(close(0) == -1)
-		{
-			perror("close");
-			return;
-			//exit(EXIT_FAILURE);
-		}
-		if(close(1) == -1)
-		{
-			perror("close");
-			return;
-			//exit(EXIT_FAILURE);
-		}
 		file_in = -1;
 		file_out = -1;
 		while((com = FirstRD(piece_str)) != -1)
@@ -271,6 +250,15 @@ void IORedir(string input)
 			switch(com)
 			{
 				case 0:
+					//close file_in if it has already been opened
+					if(file_in != -1)
+					{
+						if(close(file_in) == -1)
+						{
+							perror("close");
+							return;
+						}
+					}
 					pos = piece_str.find(RD_IN);
 					if(piece_str[pos+1] == '\0')
 					{
@@ -287,13 +275,27 @@ void IORedir(string input)
 					//remove RD_IN flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
 					//redirect stdin
-					if((file_in = open(file.c_str(), O_RDONLY)) == -1)
+					if((file_in = open(file.c_str(), O_RDWR)) == -1)
 					{
 						perror("open");
 						return;
 					}
+					if(dup2(file_in, 0) == -1)
+					{
+						perror("dup2");
+						return;
+					}
 					break;
 				case 1:
+					//close file_out if it has already been opened
+					if(file_out != -1)
+					{
+						if(close(file_out) == -1)
+						{
+							perror("close");
+							return;
+						}
+					}
 					pos = piece_str.find(RD_OUT);
 					if(piece_str[pos+1] == '\0')
 					{
@@ -310,13 +312,27 @@ void IORedir(string input)
 					//remove RD_OUT flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
 					//redirect stdout
-					if((file_out = creat(file.c_str(), O_RDONLY)) == -1)
+					if((file_out = open(file.c_str(), O_CREAT|O_RDWR|O_TRUNC)) == -1)
 					{
 						perror("creat");
 						return;
 					}
+					if(dup2(file_out, 1) == -1)
+					{
+						perror("dup2");
+						return;
+					}
 					break;
 				case 2:
+					//close file_out if it has already been opened
+					if(file_out != -1)
+					{
+						if(close(file_out) == -1)
+						{
+							perror("close");
+							return;
+						}
+					}
 					pos = piece_str.find(RD_OUTAPP);
 					if(piece_str[pos+2] == '\0')
 					{
@@ -324,7 +340,7 @@ void IORedir(string input)
 						return;
 					}
 					//get file for stdin redirection and remove file from piece_str
-					file = GetFile(piece_str, pos+1);
+					file = GetFile(piece_str, pos+2);
 					if(file == "")
 					{
 						cerr << "error: no target for output redirection\n";
@@ -333,9 +349,14 @@ void IORedir(string input)
 					//remove RD_OUTAPP flag from piece_str for use in execvp
 					piece_str.erase(pos, 2);
 					//redirect stdout
-					if((file_out = open(file.c_str(), O_CREAT|O_RDONLY)) == -1)
+					if((file_out = open(file.c_str(), O_CREAT|O_RDWR)) == -1)
 					{
 						perror("open");
+						return;
+					}
+					if(dup2(file_out, 1) == -1)
+					{
+						perror("dup2");
 						return;
 					}
 					break;
@@ -344,26 +365,26 @@ void IORedir(string input)
 			}
 		}
 		//run command piece_str
+		memset(command, '\0', BUFSIZ);
+		GetCom(input.c_str(), command);
+		Execute(command);
+		FreeMem(command);
 		//restore original stdin and stdout
-		if(dup2(std_in, 0) == -1)
+		if(file_in != -1)
 		{
-			perror("dup2");
-			return;
+			if(close(file_in) == -1)
+			{
+				perror("close");
+				return;
+			}
 		}
-		if(dup2(std_out, 1) == -1)
+		if(file_out != -1)
 		{
-			perror("dup2");
-			return;
-		}
-		if(close(std_in) == -1)
-		{
-			perror("close");
-			return;
-		}
-		if(close(std_out) == -1)
-		{
-			perror("close");
-			return;
+			if(close(file_out) == -1)
+			{
+				perror("close");
+				return;
+			}
 		}
 		piece = strtok_r(NULL, PIPE, &saveptr);
 	}
@@ -440,18 +461,41 @@ void RunWCon(string input)
 	}
 	else
 	{
-		char* command[BUFSIZ];
-		memset(command, '\0', BUFSIZ);
-		GetCom(input.c_str(), command);
 		if(FirstRD(input) > -1)
 		{
+			int std_in, std_out;
+			if((std_in = dup(0)) == -1)
+			{
+				perror("dup");
+				exit(EXIT_FAILURE);
+			}
+			if((std_out = dup(1)) == -1)
+			{
+				perror("dup");
+				exit(EXIT_FAILURE);
+			}
+			close(0);
+			close(1);
 			IORedir(input);
+			if(dup2(std_in, 0) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
+			if(dup2(std_out,1) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
 		}
 		else
 		{
+			char* command[BUFSIZ];
+			memset(command, '\0', BUFSIZ);
+			GetCom(input.c_str(), command);
 			Execute(command);
+			FreeMem(command);
 		}
-		FreeMem(command);
 	}
 }
 
