@@ -139,7 +139,7 @@ int FirstRD(string command)
 		if(pos != -1)
 		{
 			pos = (pos > tmp)? tmp: pos;
-			toRet = 1;
+			toRet = (pos == tmp)? 1: toRet;
 		}
 		else
 		{
@@ -154,7 +154,14 @@ int FirstRD(string command)
 		if(pos != -1)
 		{
 			pos = (pos > tmp)? tmp: pos;
-			toRet = (pos != tmp)? 1: 2;
+			if(toRet != 0)
+			{
+				toRet = (pos != tmp)? 1: 2;
+			}
+			else
+			{
+				toRet = (pos == tmp)? 2: toRet;
+			}
 		}
 		else
 		{
@@ -169,6 +176,7 @@ int FirstRD(string command)
 		if(pos != -1)
 		{
 			pos = (pos > tmp)? tmp: pos;
+			toRet = (pos == tmp)? 3: toRet;
 			toRet = 3;
 		}
 		else
@@ -184,10 +192,18 @@ int FirstRD(string command)
 //it from piece
 string GetFile(string& piece, int pos)
 {
-	unsigned int end_pos = piece.find_first_not_of(" \t\n\v\f\r", pos);
+	int end_pos = piece.find_first_not_of(" \t\n\v\f\r", pos);
+	unsigned int tmp;
+	string file;
+	if(end_pos == -1)
+	{
+		file = "";
+		return file;
+	}
 	for(; !isspace(piece[end_pos]); end_pos++)
 	{
-		if(end_pos == piece.size())
+		tmp = end_pos;
+		if(tmp == piece.size())
 		{
 			break;
 		}
@@ -204,7 +220,7 @@ string GetFile(string& piece, int pos)
 			break;
 		}
 	}
-	string file = piece.substr(pos, end_pos-pos);
+	file = piece.substr(pos, end_pos-pos);
 	size_t sz = end_pos - pos;
 	piece.erase(pos, sz);
 	return file;
@@ -214,7 +230,7 @@ string GetFile(string& piece, int pos)
 void IORedir(string input)
 {
 	char* piece, *saveptr;
-	int pos, com;
+	int pos, com, std_in, std_out;
 	string piece_str, file;
 	char tmp[BUFSIZ];
 	TokSet(tmp, input);
@@ -222,34 +238,117 @@ void IORedir(string input)
 	while(piece != NULL)
 	{
 		piece_str = piece;
+		if((std_in = dup(0)) == -1)
+		{
+			perror("dup");
+			exit(EXIT_FAILURE);
+		}
+		if((std_out = dup(1)) == -1)
+		{
+			perror("dup");
+			exit(EXIT_FAILURE);
+		}
 		while((com = FirstRD(piece_str)) != -1)
 		{
 			switch(com)
 			{
 				case 0:
 					pos = piece_str.find(RD_IN);
+					if(piece_str[pos+1] == '\0')
+					{
+						cerr << "error: no target for input redirection\n";
+						return;
+					}
 					//get file for stdin redirection and remove file from piece_str
 					file = GetFile(piece_str, pos+1);
+					if(file == "")
+					{
+						cerr << "error: no target for input redirection\n";
+						return;
+					}
 					//remove RD_IN flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
+					/*if(close(0) == -1)
+					{
+						perror("close");
+						return;
+						//exit(EXIT_FAILURE);
+					}
+					*///redirect stdin
 					break;
 				case 1:
 					pos = piece_str.find(RD_OUT);
+					if(piece_str[pos+1] == '\0')
+					{
+						cerr << "error: no target for output redirection\n";
+						return;
+					}
 					//get file for stdin redirection and remove file from piece_str
 					file = GetFile(piece_str, pos+1);
+					if(file == "")
+					{
+						cerr << "error: no target for output redirection\n";
+						return;
+					}
 					//remove RD_OUT flag from piece_str for use in execvp
 					piece_str.erase(pos, 1);
+					/*if(close(1) == -1)
+					{
+						perror("close");
+						return;
+						//exit(EXIT_FAILURE);
+					}
+					*///redirect stdout
 					break;
 				case 2:
 					pos = piece_str.find(RD_OUTAPP);
+					if(piece_str[pos+2] == '\0')
+					{
+						cerr << "error: no target for output redirection\n";
+						return;
+					}
 					//get file for stdin redirection and remove file from piece_str
 					file = GetFile(piece_str, pos+1);
+					if(file == "")
+					{
+						cerr << "error: no target for output redirection\n";
+						return;
+					}
 					//remove RD_OUTAPP flag from piece_str for use in execvp
-					piece_str.erase(pos, 1);
+					piece_str.erase(pos, 2);
+					/*if(close(1) == -1)
+					{
+						perror("close");
+						return;
+						//exit(EXIT_FAILURE);
+					}
+					*///redirect stdout
 					break;
 				default:
 					break;
 			}
+		}
+		//run command piece_str
+		//restore original stdin and stdout
+		if(dup2(std_in, 0) == -1)
+		{
+			perror("dup2");
+			exit(EXIT_FAILURE);
+		}
+		if(dup2(std_out, 1) == -1)
+		{
+			perror("dup2");
+			exit(EXIT_FAILURE);
+		}
+		if(close(std_in) == -1)
+		{
+			perror("close");
+			exit(EXIT_FAILURE);
+		}
+		if(close(std_out) == -1)
+		{
+			perror("close");
+			exit(EXIT_FAILURE);
 		}
 		piece = strtok_r(NULL, PIPE, &saveptr);
 	}
