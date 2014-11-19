@@ -15,7 +15,7 @@ cp:
 	mkdir -p $(BIN)
 	cd bin; g++ ../src/cp.cpp $(CFLAGS) -o cp
 
-rshell: src/my_queue.h
+rshell:
 	mkdir -p $(BIN)
 	cd bin; g++ ../src/rshell.cpp $(CFLAGS) -o rshell
 
