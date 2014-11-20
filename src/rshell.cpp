@@ -173,6 +173,21 @@ string GetFile(string& piece, int pos)
 //executes commands while conducting io redirection
 bool ExecuteRedir(string command)
 {
+	vector <char*> toRedr;
+	char* toAdd;
+	char* saveptr;
+	char tokBuf[BUFSIZ];
+	TokSet(tokBuf, command);
+	toAdd = strtok_r(tokBuf, PIPE, &saveptr);
+	while(toAdd != NULL)
+	{
+		toRedr.push_back(toAdd);
+		toAdd = strtok_r(NULL, PIPE, &saveptr);
+	}
+	//for(unsigned int i = 0; i < toRedr.size(); i++)
+	//{
+	//	cerr << toRedr[i] << endl;
+	//}
 	return false;
 }
 
@@ -228,6 +243,7 @@ bool Execute(const char* command)
 	if(FirstRD(com_str) > -1)
 	{
 		//piping and/or redirection
+		return ExecuteRedir(com_str);
 	}
 	else
 	{
