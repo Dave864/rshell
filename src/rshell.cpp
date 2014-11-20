@@ -184,10 +184,81 @@ bool ExecuteRedir(string command)
 		toRedr.push_back(toAdd);
 		toAdd = strtok_r(NULL, PIPE, &saveptr);
 	}
-	//for(unsigned int i = 0; i < toRedr.size(); i++)
-	//{
-	//	cerr << toRedr[i] << endl;
-	//}
+	//pipe from parent to child
+	int pp2c[2];
+	//pipe from child to parent
+	int pc2p[2];
+	int PID, status;
+	for(unsigned int i = 0; i < toRedr.size(); i++)
+	{
+		if(i != toRedr.size()-1)
+		{
+			if(pipe(pp2c) == -1)
+			{	
+				perror("pipe");
+				continue;
+			}
+			if(pipe(pc2p) == -1)
+			{	
+				perror("pipe");
+				continue;
+			}
+		}
+		PID = fork();
+		//fork failed
+		if(PID == -1)
+		{
+			perror("fork");
+		}
+		//child process
+		else if(PID == 0)
+		{
+			if(i != 0)
+			{
+				if(close(pp2c[1]) == -1)
+				{
+					perror("close");
+					exit(EXIT_FAILURE);
+				}
+				if(dup2(pp2c[0], 0) == -1)
+				{
+					perror("dup2");
+					exit(EXIT_FAILURE);
+				}
+			}
+			if(i != (toRedr.size()-1))
+			{
+				if(close(pc2p[0]) == -1)
+				{
+					perror("close");
+					exit(EXIT_FAILURE);
+				}
+				if(dup2(pc2p[1], 1) == -1)
+				{
+					perror("dup");
+					exit(EXIT_FAILURE);
+				}
+			}
+			/*if((i == 0) && (i == toRedr.size()-1))
+			{
+			}*/
+			char* comArray[BUFSIZ];
+			memset(comArray, '\0', BUFSIZ);
+			GetCom(toRedr[i], comArray);
+			if(execvp(comArray[0], comArray) == -1)
+			{
+				perror("execvp");
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+	for(unsigned j = 0; j < toRedr.size(); j++)
+	{
+		if(wait(&status) == -1)
+		{
+			perror("wait");
+		}
+	}
 	return false;
 }
 
@@ -215,6 +286,7 @@ bool ExecuteNorm(const char* command)
 			exit(EXIT_FAILURE);
 		}
 	}
+	//parent process
 	else
 	{
 		PID = wait(&status);
