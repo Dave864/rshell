@@ -132,7 +132,7 @@ int FirstRD(string command)
 
 //gets the word immediately after the first io redirection command and removes
 //both it and the word from piece
-string GetFile(string& piece, int pos)
+string GetFile(string& piece, int pos, int rdcom_sz = 1)
 {
 	int end_pos = piece.find_first_not_of(" \t\n\v\f\r", pos);
 	unsigned int tmp;
@@ -165,9 +165,45 @@ string GetFile(string& piece, int pos)
 	file = piece.substr(pos, end_pos-pos);
 	size_t sz = end_pos - pos;
 	piece.erase(pos, sz);
-	//need to add removing of io redir
+	piece.erase(pos-rdcom_sz, rdcom_sz);
 	file.erase(0, file.find_first_not_of(" \t\n\v\f\r"));
 	return file;
+}
+
+//redirects stdin and stdout depending on redirection commands in command
+void Redirect(string& command)
+{
+	int rd_com, pos;
+	string file;
+	while((rd_com = FirstRD(command)) > -1)
+	{
+		switch(rd_com)
+		{
+			//redirect stdin
+			case 0:
+				pos = command.find(RD_IN);
+				file = GetFile(command, pos+1);
+				cerr << "command: " << command
+					<< "\nfile: " << file << endl << endl;
+				break;
+			//redirect stdout
+			case 1:
+				pos = command.find(RD_OUT);
+				file = GetFile(command, pos+1);
+				cerr << "command: " << command
+					<< "\nfile: " << file << endl << endl;
+				break;
+			//redirect stdout append
+			case 2:
+				pos = command.find(RD_OUTAPP);
+				file = GetFile(command, pos+2, 2);
+				cerr << "command: " << command
+					<< "\nfile: " << file << endl << endl;
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 //executes commands while conducting io redirection
@@ -178,6 +214,7 @@ bool ExecuteRedir(string command)
 	char* saveptr;
 	char tokBuf[BUFSIZ];
 	TokSet(tokBuf, command);
+	//separates commands to be piped
 	toAdd = strtok_r(tokBuf, PIPE, &saveptr);
 	while(toAdd != NULL)
 	{
@@ -213,6 +250,7 @@ bool ExecuteRedir(string command)
 		//child process
 		else if(PID == 0)
 		{
+			//pipe stdin
 			if(i != 0)
 			{
 				if(close(pp2c[1]) == -1)
@@ -226,6 +264,7 @@ bool ExecuteRedir(string command)
 					exit(EXIT_FAILURE);
 				}
 			}
+			//pipe stdout
 			if(i != (toRedr.size()-1))
 			{
 				if(close(pc2p[0]) == -1)
@@ -239,12 +278,16 @@ bool ExecuteRedir(string command)
 					exit(EXIT_FAILURE);
 				}
 			}
-			/*if((i == 0) && (i == toRedr.size()-1))
+			//run io redirection
+			string toRedr_str = toRedr[i];
+			if((i == 0) && (i == toRedr.size()-1))
 			{
-			}*/
+				Redirect(toRedr_str);
+			}
+			//execute command in toRedr_str
 			char* comArray[BUFSIZ];
 			memset(comArray, '\0', BUFSIZ);
-			GetCom(toRedr[i], comArray);
+			GetCom(toRedr_str.c_str(), comArray);
 			if(execvp(comArray[0], comArray) == -1)
 			{
 				perror("execvp");
@@ -261,7 +304,7 @@ bool ExecuteRedir(string command)
 	}
 	return false;
 }
-
+//
 //executes commands normally and returns if it was successful
 bool ExecuteNorm(const char* command)
 {
