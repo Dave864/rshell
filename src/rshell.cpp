@@ -173,7 +173,7 @@ string GetFile(string& piece, int pos, int rdcom_sz = 1)
 //redirects stdin and stdout depending on redirection commands in command
 void Redirect(string& command)
 {
-	int rd_com, pos;
+	int rd_com, pos, fd_in = -1, fd_out = -1;
 	string file;
 	while((rd_com = FirstRD(command)) > -1)
 	{
@@ -181,24 +181,96 @@ void Redirect(string& command)
 		{
 			//redirect stdin
 			case 0:
+				if(fd_in != -1)
+				{
+					if(close(fd_in) == -1)
+					{
+						perror("close");
+						exit(EXIT_FAILURE);
+					}
+				}
+				else
+				{
+					if(close(0) == -1)
+					{
+						perror("close");
+						exit(EXIT_FAILURE);
+					}
+				}
 				pos = command.find(RD_IN);
 				file = GetFile(command, pos+1);
-				cerr << "command: " << command
-					<< "\nfile: " << file << endl << endl;
+				if((fd_in = open(file.c_str(), O_CREAT|O_RDONLY, S_IRUSR|S_IWUSR)) == -1)
+				{
+					perror("open");
+					exit(EXIT_FAILURE);
+				}
+				if(dup(fd_in) == -1)
+				{
+					perror("dup");
+					exit(EXIT_FAILURE);
+				}
 				break;
 			//redirect stdout
 			case 1:
+				if(fd_out != -1)
+				{
+					if(close(fd_out) == -1)
+					{
+						perror("close");
+						exit(EXIT_FAILURE);
+					}
+				}
+				else
+				{
+					if(close(1) == -1)
+					{
+						perror("close");
+						exit(EXIT_FAILURE);
+					}
+				}
 				pos = command.find(RD_OUT);
 				file = GetFile(command, pos+1);
-				cerr << "command: " << command
-					<< "\nfile: " << file << endl << endl;
+				if((fd_out = open(file.c_str(), O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR)) == -1)
+				{
+					perror("open");
+					exit(EXIT_FAILURE);
+				}
+				if(dup(fd_out) == -1)
+				{
+					perror("dup");
+					exit(EXIT_FAILURE);
+				}
 				break;
 			//redirect stdout append
 			case 2:
+				if(fd_out != -1)
+				{
+					if(close(fd_out) == -1)
+					{
+						perror("close");
+						exit(EXIT_FAILURE);
+					}
+				}
+				else
+				{
+					if(close(1) == -1)
+					{
+						perror("close");
+						exit(EXIT_FAILURE);
+					}
+				}
 				pos = command.find(RD_OUTAPP);
 				file = GetFile(command, pos+2, 2);
-				cerr << "command: " << command
-					<< "\nfile: " << file << endl << endl;
+				if((fd_out = open(file.c_str(), O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR)) == -1)
+				{
+					perror("open");
+					exit(EXIT_FAILURE);
+				}
+				if(dup(fd_out) == -1)
+				{
+					perror("dup");
+					exit(EXIT_FAILURE);
+				}
 				break;
 			default:
 				break;
@@ -304,7 +376,7 @@ bool ExecuteRedir(string command)
 	}
 	return false;
 }
-//
+
 //executes commands normally and returns if it was successful
 bool ExecuteNorm(const char* command)
 {
