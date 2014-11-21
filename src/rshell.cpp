@@ -332,7 +332,7 @@ bool ExecuteRedir(string command)
 					exit(EXIT_FAILURE);
 				}
 			}
-			if(i == toRedr.size()-1)
+			/*if(i == toRedr.size()-1)
 			{
 				if(close(pfd[0]) == -1)
 				{
@@ -342,7 +342,7 @@ bool ExecuteRedir(string command)
 				{
 					perror("close");
 				}
-			}
+			}*/
 			//run io redirection
 			string toRedr_str = toRedr[i];
 			if((i == 0) && (i == toRedr.size()-1))

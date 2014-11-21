@@ -1,0 +1,92 @@
+Script started on Thu 20 Nov 2014 11:30:36 PM PST
+~
+amacp001@hammer $ cs100
+[0;91m
+===============================================================================
+|                                                                             |
+| You have enabled settings specific for cs100.                               |
+|                                                                             |
+===============================================================================
+[0m
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~[0;95m [0;36m$[0m cd cs100/rs[K[Khw/rshell
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (redirect) [0;36m$[0m ls
+bin  LICENSE  Makefile	README.md  src	tests
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (redirect) [0;36m$[0m make rshell
+mkdir -p "bin"
+cd bin; g++ ../src/rshell.cpp -g -Wall -Werror -pedantic -ansi -o rshell
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (redirect) [0;36m$[0m bin/rshell
+$ cat LICENSE
+Copyright (c) 2014, Mike Izbicki
+All rights reserved.
+
+All bash scripts licensed under the BSD3.
+
+All other content licensed under the Creative Commons Attribute Share-alike 4.0.
+$ cat < LICENSE
+Copyright (c) 2014, Mike Izbicki
+All rights reserved.
+
+All bash scripts licensed under the BSD3.
+
+All other content licensed under the Creative Commons Attribute Share-alike 4.0.
+$ cat LICENSE
+Copyright (c) 2014, Mike Izbicki
+All rights reserved.
+
+All bash scripts licensed under the BSD3.
+
+All other content licensed under the Creative Commons Attribute Share-alike 4.0.
+$ ls > ls.txt
+$ cat ls.txt
+bin
+LICENSE
+ls.txt
+Makefile
+README.md
+src
+tests
+$ ls >> ls.txt         -l >>       >>      >> ls.txt -l
+$ cat ls.txt
+bin
+LICENSE
+ls.txt
+Makefile
+README.md
+src
+tests
+total 24
+drwx------ 2 amacp001 classes 4096 Nov 20 23:29 bin
+-rw------- 1 amacp001 classes  179 Nov 20 23:09 LICENSE
+-rw------- 1 amacp001 classes   48 Nov 20 23:30 ls.txt
+-rw------- 1 amacp001 classes  619 Nov 20 23:08 Makefile
+-rw------- 1 amacp001 classes 1926 Nov 20 23:19 README.md
+drwx------ 2 amacp001 classes 4096 Nov 20 23:29 src
+drwx------ 2 amacp001 classes 4096 Nov 20 23:29 tests
+$ echo < "test            pwf d > ls.txt > pwd.txt
+$ cat ls.tst  xt
+$ 
+^C
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (redirect) [0;36m$[0m bin/rshell
+$ cat pwd.txt
+/class/classes/amacp001/cs100/hw/rshell
+$ cat <       wc < cat < Makefile
+ 26 107 619
+$ wc < Makefile
+ 26 107 619
+$ wc Makefile
+ 26 107 619 Makefile
+$ wc < Mak kfile    efile >   wc.txt -L l
+$ cat wc.txt
+26
+$ wc -l Makefile
+26 Makefile
+$ exit
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (redirect) [0;36m$[0m ls
+bin  cat  LICENSE  ls.txt  Makefile  pwd.txt  README.md  src  tests  wc.txt
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (redirect) [0;36m$[0m exit
+exit
+~
+amacp001@hammer $ exit
+exit
+
+Script done on Thu 20 Nov 2014 11:41:05 PM PST
