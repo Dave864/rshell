@@ -42,9 +42,16 @@ void GetCom(const char* input, char* command[])
 	}
 }
 
-void ExecCom(char* command[])
+void ExecCom(char* argList[])
 {
-	if(execvp(command[0], command) == -1)
+	char *path= getenv("PATH");
+	if(path == NULL)
+	{
+		perror("getenv");
+		exit(EXIT_FAILURE);
+	}
+	cerr << "path is " << path << endl;
+	if(execvp(argList[0], argList) == -1)
 	{
 		perror("execvp");
 		exit(EXIT_FAILURE);
