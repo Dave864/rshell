@@ -42,6 +42,16 @@ void GetCom(const char* input, char* command[])
 	}
 }
 
+void ExecCom(char* command[])
+{
+	if(execvp(command[0], command) == -1)
+	{
+		perror("execvp");
+		exit(EXIT_FAILURE);
+	}
+	return;
+}
+
 //finds out which redirection command appears first
 int FirstRD(string command)
 {
@@ -330,16 +340,11 @@ bool ExecuteRedir(string command)
 				Redirect(toRedr_str);
 			}
 			//execute command in toRedr_str
-			//Change so path searching is used
-			//==========================================
 			char* comArray[BUFSIZ];
 			memset(comArray, '\0', BUFSIZ);
 			GetCom(toRedr_str.c_str(), comArray);
-			if(execvp(comArray[0], comArray) == -1)
-			{
-				perror("execvp");
-				exit(EXIT_FAILURE);
-			}
+			//========================================
+			ExecCom(comArray);
 			//=========================================
 		}
 	}

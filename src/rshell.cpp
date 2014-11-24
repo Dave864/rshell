@@ -52,13 +52,8 @@ bool ExecuteNorm(const char* command)
 	//child process
 	else if(PID == 0)
 	{
-	//Change so PATH searching is used
 	//============================================
-		if(execvp(comArray[0], comArray) == -1)
-		{
-			perror("execvp");
-			exit(EXIT_FAILURE);
-		}
+		ExecCom(comArray);
 	//============================================
 	}
 	//parent process
