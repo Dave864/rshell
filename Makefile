@@ -1,7 +1,7 @@
 CFLAGS=-g -Wall -Werror -pedantic -ansi
 BIN="bin"
 
-all: src/printLs.h src/my_queue.h
+all: src/printLs.h src/my_queue.h src/redir.h
 	mkdir -p $(BIN)
 	cd bin; g++ ../src/rshell.cpp $(CFLAGS) -o rshell
 	cd bin; g++ ../src/cp.cpp $(CFLAGS) -o cp
@@ -15,7 +15,7 @@ cp:
 	mkdir -p $(BIN)
 	cd bin; g++ ../src/cp.cpp $(CFLAGS) -o cp
 
-rshell:
+rshell: src/redir.h
 	mkdir -p $(BIN)
 	cd bin; g++ ../src/rshell.cpp $(CFLAGS) -o rshell
 
