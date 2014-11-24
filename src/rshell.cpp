@@ -506,14 +506,16 @@ int main()
 	while(1)
 	{
 		cout << "$ ";
-		cin >> ws;
 		getline(cin, input);
-		DelComment(input);
-		if(ExitFound(input))
+		if(input != "\n")
 		{
-			return 0;
+			DelComment(input);
+			if(ExitFound(input))
+			{
+				return 0;
+			}
+			RunWCon(input);
 		}
-		RunWCon(input);
 	}
 	return 0;
 }
