@@ -34,10 +34,12 @@ To run the command after it has been compiled run the command
 * The program will stop functioning properly if only a newline character is entered.
 * When redirecting output to multiple files, only the last file in the chain will recieve
 the output. In other words
+
 	$ command > file1 > file2 > file3
 	//creates three files
 	//file1 and file2 are empty
 	//file3 contains the result of command
+
 * When redirecting input multiple times, only the last file in the chain will be read from while
 the rest will be empty, similar to the issue before.
 * The program is not able to handle the piping of commands.
