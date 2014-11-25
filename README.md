@@ -36,8 +36,11 @@ To run the command after it has been compiled run the command
 the output. In other words
 
 `$ command > file1 > file2 > file3
+
 //creates three files
+
 //file1 and file2 are empty
+
 //file3 contains the result of command`
 
 * When redirecting input multiple times, only the last file in the chain will be read from while
