@@ -35,13 +35,13 @@ To run the command after it has been compiled run the command
 * When redirecting output to multiple files, only the last file in the chain will recieve
 the output. In other words
 
-`$ command > file1 > file2 > file3
+`$ command > file1 > file2 > file3`
 
-//creates three files
+`//creates three files`
 
-//file1 and file2 are empty
+`//file1 and file2 are empty`
 
-//file3 contains the result of command`
+`//file3 contains the result of command`
 
 * When redirecting input multiple times, only the last file in the chain will be read from while
 the rest will be empty, similar to the issue before.
