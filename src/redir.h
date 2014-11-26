@@ -28,11 +28,11 @@ void TokSet(char* tmp, string input)
 
 //extracts all whitespace seperated substrings from input puts them into
 //an array of char*
-void GetCom(const char* input, char* command[])
+void GetCom(const char *input, char *command[])
 {
 	char tmp[BUFSIZ];
 	TokSet(tmp, input);
-	char* elmt = strtok(tmp, " \t\n\v\f\r");
+	char *elmt = strtok(tmp, " \t\n\v\f\r");
 	int i = 0;
 	while(elmt != NULL)
 	{
@@ -42,19 +42,48 @@ void GetCom(const char* input, char* command[])
 	}
 }
 
-void ExecCom(char* argList[])
+//this function does nothing but lets me create an empty char** that isn't
+//explicitly used for anything
+void KeepMe(char *wordList[])
 {
+	return;
+}
+
+//searches path variable for command and executes it if found
+void ExecCom(char *argList[])
+{
+	//creating this empty char** somehow preserves the contents of argList
+	char *empty[BUFSIZ];
+	memset(empty, '\0', BUFSIZ);
+	KeepMe(empty);
+	//get PATH environment variable
 	char *path= getenv("PATH");
 	if(path == NULL)
 	{
 		perror("getenv");
 		exit(EXIT_FAILURE);
 	}
-	cerr << "path is " << path << endl;
-	if(execvp(argList[0], argList) == -1)
+	//searches PATH for command argList[0]
+	char tmp[BUFSIZ];
+	char *saveptr;
+	string com_str;
+	TokSet(tmp, string(path));
+	char *command = strtok_r(tmp, ":", &saveptr);
+	while(command != NULL)
 	{
-		perror("execvp");
-		exit(EXIT_FAILURE);
+		com_str = command;
+		com_str += (com_str[com_str.size()-1] != '/') ? "/": "";
+		com_str += argList[0];
+		//execute comand argList[0] if it's in path com_str
+		if(access(com_str.c_str(), F_OK) != -1)
+		{
+			if(execv(com_str.c_str(), argList) == -1)
+			{
+				perror("execv");
+				exit(EXIT_FAILURE);
+			}
+		}
+		command = strtok_r(NULL, ":", &saveptr);
 	}
 	return;
 }
@@ -279,8 +308,8 @@ void Redirect(string& command)
 bool ExecuteRedir(string command)
 {
 	vector <char*> toRedr;
-	char* toAdd;
-	char* saveptr;
+	char *toAdd;
+	char *saveptr;
 	char tokBuf[BUFSIZ];
 	TokSet(tokBuf, command);
 	//separates commands to be piped
@@ -347,7 +376,7 @@ bool ExecuteRedir(string command)
 				Redirect(toRedr_str);
 			}
 			//execute command in toRedr_str
-			char* comArray[BUFSIZ];
+			char *comArray[BUFSIZ];
 			memset(comArray, '\0', BUFSIZ);
 			GetCom(toRedr_str.c_str(), comArray);
 			//========================================
