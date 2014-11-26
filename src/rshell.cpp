@@ -92,15 +92,48 @@ bool Execute(const char* command)
 	return false;
 }
 
+//finds the first connector in word
+int FirstCon(string word)
+{
+	int cur = 0, prev = -1, con = 0;
+	//find which connector comes first
+	if((cur = word.find(C_NEXT)) != -1)
+	{
+		con = 1;
+		prev = cur;
+	}
+	if((cur = word.find(C_AND)) != -1)
+	{
+		if((cur < prev) || (prev == -1))
+		{
+			con = 2;
+			prev = cur;
+		}
+	}
+	if((cur = word.find(C_OR)) != -1)
+	{
+		if((cur < prev) || (prev == -1))
+		{
+			con = 3;
+		}
+	}
+	return con;
+}
+
 //gets the commands seperated by the connectors and executes each command
 void ParseExecute(string input, const char* cnctr)
 {
-	char* command, *saveptr;
+	char *command, *saveptr;
 	bool success;
 	char tmp[BUFSIZ];
 	TokSet(tmp, input);
 	command = strtok_r(tmp, cnctr, &saveptr);
 	//if command has a connector that isn't cnctr, display error and return
+	if(FirstCon(string(command)) > 0)
+	{
+		cerr << "error: more than one connector used\n";
+		return;
+	}
 	while(command != NULL)
 	{
 		//check for redirection and run if it exists
@@ -121,6 +154,12 @@ void ParseExecute(string input, const char* cnctr)
 		}
 		command = strtok_r(NULL, cnctr, &saveptr);
 		//if command has a connector that isn't cnctr, display error and return
+		if(command == NULL);
+		else if(FirstCon(string(command)) > 0)
+		{
+			cerr << "error: more than one connector used\n";
+			return;
+		}
 	}
 }
 

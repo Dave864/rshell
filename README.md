@@ -29,9 +29,9 @@ To run the command after it has been compiled run the command
 
 ####Bug List
 
-* If multiple types of connectors are entered, the program will yield undefined behaviour.
-* This program can only run executables in the /bin directory in bash.
-* The program will stop functioning properly if only a newline character is entered.
+* If multiple types of connectors are entered, the program will run the first command and then
+yield an error.
+* This program cannot run the cd command 
 * When redirecting output to multiple files, only the last file in the chain will recieve
 the output. In other words
 
