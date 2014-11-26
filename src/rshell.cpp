@@ -52,9 +52,7 @@ bool ExecuteNorm(const char* command)
 	//child process
 	else if(PID == 0)
 	{
-	//============================================
 		ExecCom(comArray);
-	//============================================
 	}
 	//parent process
 	else
@@ -114,7 +112,7 @@ void ParseExecute(string input, const char* cnctr)
 				return;
 			}
 		}
-		else if(strncmp(cnctr, C_AND, strlen(cnctr)) == 0)
+		else if(strncmp(cnctr, C_OR, strlen(cnctr)) == 0)
 		{
 			if(success)
 			{
