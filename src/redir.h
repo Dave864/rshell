@@ -85,6 +85,8 @@ void ExecCom(char *argList[])
 		}
 		command = strtok_r(NULL, ":", &saveptr);
 	}
+	cerr << "error: " << argList[0] << ": command not found\n";
+	exit(EXIT_FAILURE);
 	return;
 }
 
