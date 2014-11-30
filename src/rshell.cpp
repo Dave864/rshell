@@ -218,7 +218,7 @@ int main()
 		}
 		cout << cwd << " $ ";
 		getline(cin, input);
-		if(input != "\n")
+		if(!input.empty())
 		{
 			DelComment(input);
 			if(ExitFound(input))

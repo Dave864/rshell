@@ -76,10 +76,7 @@ bool CD(char *command[])
 		}
 		else
 		{
-			//string home_str = home;
-			//home_str += "/";
-			//home_str += command[1];
-			if(chdir(/*home_str.c_str()*/command[1]) == -1)
+			if(chdir(command[1]) == -1)
 			{
 				perror("chdir");
 				return false;
