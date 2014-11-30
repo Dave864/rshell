@@ -4,12 +4,12 @@
 
 An implementation of the bash shell. When executed, the terminal will display
 	
-	$
+	<current directory>$
 
 at which point the user will be able to enter commands to run. After each command is run
 the prompt will be displayed again until the command
 
-	$ exit
+	<current directory>$ exit
 
 is entered.
 
@@ -31,7 +31,6 @@ To run the command after it has been compiled run the command
 
 * If multiple types of connectors are entered, the program will run the first command and then
 yield an error.
-* This program cannot run the cd command 
 * When redirecting output to multiple files, only the last file in the chain will recieve
 the output. In other words
 
@@ -41,9 +40,11 @@ $ command > file1 > file2 > file3
 //file1 and file2 are empty
 //file3 contains the result of command
 ```
-
 * When redirecting input multiple times, only the last file in the chain will be read from while
 the rest will be empty, similar to the issue before.
+* When running the cd command, if two locations are given, the program will change the location
+to the home directory.
+* The cd command will yield undefined behavior if used in io redirection.
 * The program is not able to handle the piping of commands.
 
 ##LS
