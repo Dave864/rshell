@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -42,6 +43,52 @@ void GetCom(const char *input, char *command[])
 	}
 }
 
+//runs cd command and return if successful or not
+bool CD(char *command[])
+{
+	char *home;
+	if((home = getenv("HOME")) == NULL)
+	{
+		perror("getenv");
+		return false;
+	}
+	int i;
+	for(i = 0; command[i] != NULL; i++);
+	//go back to home directory
+	if((i == 1) || (i > 2))
+	{
+		if(chdir(home) == -1)
+		{
+			perror("chdir");
+			return false;
+		}
+	}
+	//go to directory command[1]
+	else
+	{		
+		if(strcmp(command[1], "~") == 0)
+		{
+			if(chdir(home) == -1)
+			{
+				perror("chdir");
+				return false;
+			}
+		}
+		else
+		{
+			//string home_str = home;
+			//home_str += "/";
+			//home_str += command[1];
+			if(chdir(/*home_str.c_str()*/command[1]) == -1)
+			{
+				perror("chdir");
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 //this function does nothing but lets me create an empty char** that isn't
 //explicitly used for anything
 void KeepMe(char *wordList[])
@@ -66,12 +113,31 @@ void ExecCom(char *argList[])
 	//searches PATH for command argList[0]
 	char tmp[BUFSIZ];
 	char *saveptr;
+	//DIR *dirp;
+	//dirent *direntp;
 	string com_str;
 	TokSet(tmp, string(path));
 	char *command = strtok_r(tmp, ":", &saveptr);
 	while(command != NULL)
 	{
 		com_str = command;
+		/*if((dirp = opendir(command)) == NULL)
+		{
+			perror("opendir");
+		}
+		errno = 0;
+		while((direntp = readdir(dirp)))
+		{
+			cerr << '\t' << direntp->d_name << endl;
+		}
+		if(errno != 0)
+		{
+			perror("readdir");
+		}
+		if(closedir(dirp) == -1)
+		{
+			perror("readdir");
+		}*/
 		com_str += (com_str[com_str.size()-1] != '/') ? "/": "";
 		com_str += argList[0];
 		//execute comand argList[0] if it's in path com_str
@@ -381,9 +447,7 @@ bool ExecuteRedir(string command)
 			char *comArray[BUFSIZ];
 			memset(comArray, '\0', BUFSIZ);
 			GetCom(toRedr_str.c_str(), comArray);
-			//========================================
 			ExecCom(comArray);
-			//=========================================
 		}
 	}
 	for(unsigned j = 0; j < toRedr.size(); j++)

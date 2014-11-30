@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -40,6 +41,11 @@ bool ExecuteNorm(const char* command)
 	char* comArray[BUFSIZ];
 	memset(comArray, '\0', BUFSIZ);
 	GetCom(command, comArray);
+	//run cd command if it exists
+	if(string(comArray[0]) == "cd")
+	{
+		return CD(comArray);
+	}
 	int status;
 	pid_t PID;
 	PID = fork();
@@ -202,9 +208,15 @@ void RunWCon(string input)
 int main()
 {
 	string input;
+	char cwd[BUFSIZ];
 	while(1)
 	{
-		cout << "$ ";
+		if(getcwd(cwd, BUFSIZ) == NULL)
+		{
+			perror("getcwd");
+			exit(EXIT_FAILURE);
+		}
+		cout << cwd << " $ ";
 		getline(cin, input);
 		if(input != "\n")
 		{
