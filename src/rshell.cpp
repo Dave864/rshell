@@ -19,6 +19,11 @@ using namespace std;
 #define C_OR "||"
 #define COMMENT "#"
 
+void interrupt(int signum)
+{
+	cerr << endl;
+}
+
 //removes comments from input
 void DelComment(string& input)
 {
@@ -211,6 +216,10 @@ int main()
 	char cwd[BUFSIZ];
 	while(1)
 	{
+		if(signal(SIGINT, interrupt) == SIG_ERR)
+		{
+			perror("signal");
+		}
 		if(getcwd(cwd, BUFSIZ) == NULL)
 		{
 			perror("getcwd");

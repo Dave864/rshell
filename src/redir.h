@@ -54,7 +54,8 @@ bool CD(char *command[])
 	}
 	int i;
 	for(i = 0; command[i] != NULL; i++);
-	//go back to home directory
+	//go back to home directory if zero or more than one
+	//destinatio is given
 	if((i == 1) || (i > 2))
 	{
 		if(chdir(home) == -1)
@@ -110,31 +111,12 @@ void ExecCom(char *argList[])
 	//searches PATH for command argList[0]
 	char tmp[BUFSIZ];
 	char *saveptr;
-	//DIR *dirp;
-	//dirent *direntp;
 	string com_str;
 	TokSet(tmp, string(path));
 	char *command = strtok_r(tmp, ":", &saveptr);
 	while(command != NULL)
 	{
 		com_str = command;
-		/*if((dirp = opendir(command)) == NULL)
-		{
-			perror("opendir");
-		}
-		errno = 0;
-		while((direntp = readdir(dirp)))
-		{
-			cerr << '\t' << direntp->d_name << endl;
-		}
-		if(errno != 0)
-		{
-			perror("readdir");
-		}
-		if(closedir(dirp) == -1)
-		{
-			perror("readdir");
-		}*/
 		com_str += (com_str[com_str.size()-1] != '/') ? "/": "";
 		com_str += argList[0];
 		//execute comand argList[0] if it's in path com_str

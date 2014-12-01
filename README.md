@@ -2,20 +2,21 @@
 
 ####General Overview
 
-An implementation of the bash shell. When executed, the terminal will display
+An implementation of the bash shell. When executed the terminal will display
 	
-	<current directory>$
+	<current working directory>$
 
 at which point the user will be able to enter commands to run. After each command is run
 the prompt will be displayed again until the command
 
-	<current directory>$ exit
+	exit
 
 is entered.
 
 ######things to note
-* This program supports the next (;), and (&&), and or (||) connectors. 
+* This program supports the next `;`, and `&&`, and or `||` connectors. 
 * This program is capable of limited input output redirection.
+* The `^C` signal will not terminate the program; only the `exit` command will.
 
 ####Compiling and Running
 
@@ -34,18 +35,30 @@ yield an error.
 * When redirecting output to multiple files, only the last file in the chain will recieve
 the output. In other words
 
-```
-$ command > file1 > file2 > file3
+`
+<current working directory>$ command > file1 > file2 > file3
 //creates three files
 //file1 and file2 are empty
 //file3 contains the result of command
-```
+`
 * When redirecting input multiple times, only the last file in the chain will be read from while
 the rest will be empty, similar to the issue before.
 * When running the cd command, if two locations are given, the program will change the location
 to the home directory.
 * The cd command will yield undefined behavior if used in io redirection.
 * The program is not able to handle the piping of commands.
+* Each time the `^C` flag is called in the main prompt, a newline will be displayed until a command is entered.
+For example.
+
+`
+//call ^C three times and then a command
+<current working directoyr>$ ^C
+^C
+^C
+<command>
+//command is run
+<current working directory>$ 
+`
 
 ##LS
 
