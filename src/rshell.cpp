@@ -19,6 +19,7 @@ using namespace std;
 #define C_OR "||"
 #define COMMENT "#"
 
+//interrupt signal handler
 void interrupt(int signum)
 {
 	cerr << endl;
@@ -210,22 +211,40 @@ void RunWCon(string input)
 	}
 }
 
+//displays the prompt
+void prompt(void)
+{
+	string cwd_str;
+	char *home;
+	char cwd[BUFSIZ];
+	if(getcwd(cwd, BUFSIZ) == NULL)
+	{
+		perror("getcwd");
+		exit(EXIT_FAILURE);
+	}
+	if((home = getenv("HOME")) == NULL)
+	{
+		perror("getenv");
+		cout << " $ ";
+	}
+	else
+	{
+		cwd_str = string(cwd);
+		cwd_str = cwd_str.substr(string(home).size());
+		cout << '~' << cwd_str << " $ ";
+	}
+}
+
 int main()
 {
 	string input;
-	char cwd[BUFSIZ];
 	while(1)
 	{
 		if(signal(SIGINT, interrupt) == SIG_ERR)
 		{
 			perror("signal");
 		}
-		if(getcwd(cwd, BUFSIZ) == NULL)
-		{
-			perror("getcwd");
-			exit(EXIT_FAILURE);
-		}
-		cout << cwd << " $ ";
+		prompt();
 		getline(cin, input);
 		if(!input.empty())
 		{
