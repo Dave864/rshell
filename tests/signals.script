@@ -1,0 +1,117 @@
+Script started on Mon 01 Dec 2014 05:51:48 PM PST
+~
+amacp001@hammer $ cs100
+[0;91m
+===============================================================================
+|                                                                             |
+| You have enabled settings specific for cs100.                               |
+|                                                                             |
+===============================================================================
+[0m
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~[0;95m [0;36m$[0m cs[Kd cs100/hw/l[Krshell
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (exec_update) [0;36m$[0m ls
+LICENSE  Makefile  README.md  src  tests
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (exec_update) [0;36m$[0m make rshell
+mkdir -p "bin"
+cd bin; g++ ../src/rshell.cpp -g -Wall -Werror -pedantic -ansi -o rshell
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (exec_update) [0;36m$[0m cs[K[Kbin/rshell
+~/cs100/hw/rshell $ ls src
+cp.cpp	ls.cpp	my_queue.h  printLs.h  redir.h	rshell.cpp  Timer.h
+~/cs100/hw/rshell $ make cp
+mkdir -p "bin"
+cd bin; g++ ../src/cp.cpp -g -Wall -Werror -pedantic -ansi -o cp
+~/cs100/hw/rshell $ ls -l bin; bin/cp /usr/share/dixt  ct  /linux.wordss  tmp.tt xt -a
+total 128
+-rwx------ 1 amacp001 classes 36806 Dec  1 17:51 cp
+-rwx------ 1 amacp001 classes 88360 Dec  1 17:50 rshell
+Times for in.get(char) and out.put(char)
+wallclock time: 0.420286
+user time: 0.289956
+system time: 0.009998
+
+Times for read() and write() one character at a time
+wallclock time: 7.40415
+user time: 0.484927
+system time: 6.79297
+
+Times for read() and write() one buffer at a time
+wallclock time: 7.40923
+user time: 0.411937
+system time: 6.87096
+~/cs100/hw/rshell $ ls
+bin  LICENSE  Makefile	README.md  src	tests
+~/cs100/hw/rshell $ cd ../
+~/cs100/hw $ cd rshell/src
+~/cs100/hw/rshell/src $ pwd
+/class/classes/amacp001/cs100/hw/rshell/src
+~/cs100/hw/rshell/src $ cd ../ bin
+~ $ ls -l
+total 60
+drwx------  4 amacp001 classes 4096 Dec 13  2012 cs10
+drwx------  5 amacp001 classes 4096 Oct 27 12:05 cs100
+drwx------  4 amacp001 classes 4096 Jan 12  2013 cs12
+drwx------  4 amacp001 classes 4096 Sep 27  2013 cs14
+drwx------  5 amacp001 classes 4096 Oct 28  2013 cs61
+drwx------  2 amacp001 classes 4096 Jan 29  2014 Desktop
+drwx------  2 amacp001 classes 4096 Sep 27  2013 Documents
+drwx------  2 amacp001 classes 4096 May 16  2014 Downloads
+drwx------ 10 amacp001 classes 4096 May 16  2014 ee120B
+drwx------  2 amacp001 classes 4096 Sep 27  2013 Music
+drwx------  2 amacp001 classes 4096 Sep 27  2013 Pictures
+drwx------  2 amacp001 classes 4096 Sep 27  2013 Public
+drwx------  3 amacp001 classes 4096 Oct 21  2013 sketchbook
+drwx------  2 amacp001 classes 4096 Sep 27  2013 Templates
+drwx------  2 amacp001 classes 4096 Sep 27  2013 Videos
+~ $ cd cs100/hw/rshell
+~/cs100/hw/rshell $ cd
+~ $ cd cs1-    Documents
+~/Documents $ ls
+~/Documents $ cd ~
+~ $ cd Docum     ee120b B
+~/ee120B $ ls
+lab0  lab1  lab2  lab4	lab5  lab6  lab8  lab9
+~/ee120B $ cd lab0
+~/ee120B/lab0 $ ls
+amacp001_nstew002_lab0_part1_1.c  amacp001_nstew002_lab0_part1_4.c  amacp001_nstew002_lab0_part2_2.c  try_2_6_2.c
+amacp001_nstew002_lab0_part1_2.c  amacp001_nstew002_lab0_part1_5.c  amacp001_nstew002_lab0.tgz
+amacp001_nstew002_lab0_part1_3.c  amacp001_nstew002_lab0_part2_1.c  try_2_5_1.c
+~/ee120B/lab0 $ ^C
+^C
+^C
+cat
+cat   echo
+echo
+^C
+~/ee120B/lab0 $ ^[[A^[[B        not a command             not a command ||                  n junk || junk || ls -l
+error: junk: command not found
+error: junk: command not found
+total 40
+-rwx------ 1 amacp001 classes  523 Apr  2  2014 amacp001_nstew002_lab0_part1_1.c
+-rwx------ 1 amacp001 classes  863 Apr  2  2014 amacp001_nstew002_lab0_part1_2.c
+-rwx------ 1 amacp001 classes  599 Apr  2  2014 amacp001_nstew002_lab0_part1_3.c
+-rwx------ 1 amacp001 classes  511 Apr  2  2014 amacp001_nstew002_lab0_part1_4.c
+-rwx------ 1 amacp001 classes 2154 Apr  2  2014 amacp001_nstew002_lab0_part1_5.c
+-rwx------ 1 amacp001 classes  695 Apr  4  2014 amacp001_nstew002_lab0_part2_1.c
+-rwx------ 1 amacp001 classes  626 Apr  4  2014 amacp001_nstew002_lab0_part2_2.c
+-rwx------ 1 amacp001 classes 1706 Apr  4  2014 amacp001_nstew002_lab0.tgz
+-rwx------ 1 amacp001 classes  446 Apr  4  2014 try_2_5_1.c
+-rwx------ 1 amacp001 classes  524 Apr  4  2014 try_2_6_2.c
+~/ee120B/lab0 $ ^C
+^C
+cd ../../ ;   &&              pwd
+/class/classes/amacp001/ee120B/lab0
+~/ee120B/lab0 $ cd ../../ && ls
+cs10   cs12  cs61     Documents  ee120B  Pictures  sketchbook  Videos
+cs100  cs14  Desktop  Downloads  Music	 Public    Templates
+~ $ junk || cd cs100/hw    / rshell       rshell
+error: junk: command not found
+~/cs100/hw/rshell $ ls
+bin  LICENSE  Makefile	README.md  src	tests
+~/cs100/hw/rshell $ exit
+[s%%%%%%%%%%[u[0;32mamacp001[0;36m@[0;32mcs100[0;36m:[0;32m~/cs100/hw/rshell[0;95m (exec_update) [0;36m$[0m exit
+exit
+~
+amacp001@hammer $ exit
+exit
+
+Script done on Mon 01 Dec 2014 06:00:46 PM PST
