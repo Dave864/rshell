@@ -120,17 +120,14 @@ void ExecCom(char *argList[])
 		com_str += (com_str[com_str.size()-1] != '/') ? "/": "";
 		com_str += argList[0];
 		//execute comand argList[0] if it's in path com_str
-		if(access(com_str.c_str(), F_OK) != -1)
+		if(execv(com_str.c_str(), argList) == -1);
+		else
 		{
-			if(execv(com_str.c_str(), argList) == -1)
-			{
-				perror("execv");
-				exit(EXIT_FAILURE);
-			}
+			exit(EXIT_SUCCESS);
 		}
 		command = strtok_r(NULL, ":", &saveptr);
 	}
-	cerr << "error: " << argList[0] << ": command not found\n";
+	perror("execv");
 	exit(EXIT_FAILURE);
 	return;
 }
