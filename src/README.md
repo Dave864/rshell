@@ -1,14 +1,12 @@
 #How to Use Strtok
 
-##What is Strtok?
+  ###What is Strtok?
 
-###Why You Should Care
+  	####Why You Should Care
 
-##Using Strtok
-####(and how it works)
+     ###Using Strtok
 
-##Enter the _r
-####(strtok_r)
+  ###Enter the _r (strtok_r)
 
-##Things to Remember
+  ###Things to Remember
 
