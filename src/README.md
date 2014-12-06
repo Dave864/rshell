@@ -9,18 +9,13 @@
   ```
   char *example = behold+the+power+of+strtok!;
   ```
-  and split it up into smaller components that are separated by the character `+`
+  and split it up into smaller components that are separated by the character `+` as follows
   ```
-  cout << strtok(example, "+") << endl;
-  //behold
-  cout << strtok(NULL, "+") << endl;
-  //the
-  cout << strtok(NULL, "+") << endl;
-  //power
-  cout << strtok(NULL, "+") << endl;
-  //of
-  cout << strtok(NULL, "+") << endl;
-  //strtok
+  cout << strtok(example, "+") << endl; //behold
+  cout << strtok(NULL, "+") << endl;    //the
+  cout << strtok(NULL, "+") << endl;    //power
+  cout << strtok(NULL, "+") << endl;    //of
+  cout << strtok(NULL, "+") << endl;    //strtok
   ```
 
 #####Why You Should Care
