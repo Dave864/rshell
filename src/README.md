@@ -30,8 +30,17 @@
 
 ###Using Strtok
 
+  Looking at the previous example, it is unclear exactly how `strtok` should be used. Looking at the
+  man page for the function we see that it is set up like this
+  ```
+  **#include <string.h>**
+  **char *strtok(char** **str*, **const char** **delim***);**
+  ```
+  From this we see that it takes two arguments, the string that is to be parsed, `str`, and what is known as 
+  the **delimiter**, `delim`. The function returns what is called a **token**, which is the first substring
+  in `str` that does not contain `delim`.
+
   Look back at example given to see how strtok works
-  * look at function prototype of strtok
   * brief overview of how strtok works
   * step by step walkthrough of what is going on in example
     * go over cases where deliminator is at beginning, end, or both
