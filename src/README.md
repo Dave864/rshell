@@ -33,8 +33,8 @@
   Looking at the previous example, it is unclear exactly how `strtok` should be used. Looking at the
   man page for the function we see that it is set up like this
   ```
-  **#include <string.h>**
-  **char *strtok(char** **str*, **const char** **delim***);**
+  #include <string.h>
+  char *strtok(char *str, const char *delim);
   ```
   From this we see that it takes two arguments, the string that is to be parsed, `str`, and what is known as 
   the **delimiter**, `delim`. The function returns what is called a **token**, which is the first substring
