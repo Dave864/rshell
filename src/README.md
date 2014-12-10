@@ -52,9 +52,11 @@
   Here we are parsing the string "Rootabega". The deliminator is the letter "a". So we are looking for
   the first substring in "Rootabega" that does not have the letter "a" in it. From this we see that 
   `first_token` will be assigned the word "Root", the first token of the string.
+
 	char *first_token = strtok(example_1, "a");
 	//is the same as
   	char *first_token = "Root";
+
 
   This is all well and good but it still does not explain why in the first example, `NULL` was used in
   subsequent uses of `strtok` instead of the string being parsed. What were to happen if we did not do 
@@ -89,6 +91,7 @@
   Token 1: Root
   Token 2: Root
   ```
+
 
   * Look back at example given to see how strtok works
     * brief overview of how strtok works
