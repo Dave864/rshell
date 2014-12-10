@@ -7,20 +7,23 @@
 
   What this means is that you, the user, can take the word
   ```
-  char *example = behold+the+power+of+strtok!;
+  char *example_0 = behold+the+power+of+strtok!;
   ```
   and split it up into smaller components that are separated by the character `+`
   ```
-  cout << strtok(example, "+") << endl;
+  cout << strtok(example_0, "+") << endl;
   cout << strtok(NULL, "+") << endl;
   cout << strtok(NULL, "+") << endl;
   cout << strtok(NULL, "+") << endl;
   cout << strtok(NULL, "+") << endl;
-  //behold
-  //the
-  //power
-  //of
-  //strtok
+  ```
+  to get output like this
+  ```
+  behold
+  the
+  power
+  of
+  strtok
   ```
 
 #####Why You Should Care
@@ -30,34 +33,73 @@
 
 ###Using Strtok
 
-  Looking at the previous example, it is unclear exactly how `strtok` should be used. Looking at the
-  man page for the function we see that it is set up like this
+  The example above does not make it clear exactly how `strtok` is used. Looking at how the function 
+  is set up may provide the answer. Accesseing the man page for `strtok` shows the function is set up like
+  this.
   ```
   #include <string.h>
   char *strtok(char *str, const char *delim);
   ```
-  From this we see that it takes two arguments, the string that is to be parsed, `str`, and what is known as 
-  the **delimiter**, `delim`. The function returns what is called a **token**, which is the first substring
+  So the function takes two arguments, the string that is to be parsed, `str`, and what is known as 
+  the **delimiter**, `delim`. It returns what is called a **token**, which is the first substring
   in `str` that does not contain `delim`.
 
-  Look back at example given to see how strtok works
-  * brief overview of how strtok works
-  * step by step walkthrough of what is going on in example
-    * go over cases where deliminator is at beginning, end, or both
-    * go over what happens when you change deliminator
-    * deliminator is literal, it will search for the exact character when extracting tokens
-      * There is an execption with whitespace characters, (either single space is interpreted as
+  Let's look at another example and break down what is going on
+  ``
+  char *example_1 = Rootabega;
+  char *first_token = strtok(example_1, "a");
+  ``
+  Here we are parsing the string "Rootabega". The deliminator is the letter "a". So we are looking for
+  the first substring in "Rootabega" that does not have the letter "a" in it. From this we see that 
+  `first_token` will be assigned the word "Root", the first token of the string.
+  ```
+  char *first_token = strtok(example_1, "a");
+  //is the same as
+  char *first_token = "Root";
+  ```
+
+  This is all well and good but it still does not explain why in the first example, `NULL` was used in 
+  place of the string we were parsing in subsequent uses of `strtok`. What were to happen if we did not do 
+  that?
+  Look at this program 
+  ```
+  #include <iostream>
+  #include <string.h>
+
+  int main()
+  {
+  	char *example_2 = "Alfalfa";
+	
+	//bet the first two tokens
+	char *first_token = strtok(example_2, "a");
+	char *second_token = strtok(example_2, "a");
+
+	//display the first two tokens
+	cout << "Token 1: " << first_token << endl
+		<< "Token 2: " << second_token << endl;
+  	return 0;
+  }
+  ```
+
+  * Look back at example given to see how strtok works
+    * brief overview of how strtok works
+    * step by step walkthrough of what is going on in example
+      * go oveer what happens if deliminating character is not in the string being parsed
+      * go over cases where deliminator is at beginning, end, or both
+      * go over what happens when you change deliminator
+      * deliminator is literal, it will search for the exact character when extracting tokens
+        * There is an execption with whitespace characters, (either single space is interpreted as
 	   all, or what I did in my assignments)
 
 #####Parsing Multiple Strings
 
-  Mention parsing mutiple strings
-  * What will happen if midway parsing through one we begin parsing another?
+  * Mention parsing mutiple strings
+    * What will happen if midway parsing through one we begin parsing another?
 
 ###Enter the _r (Parsing multiple strings)
 
-  See how strtok_r works
-  * note similarity to strtok with addition of saveptr
+  * See how strtok_r works
+    * note similarity to strtok with addition of saveptr
     * what saveptr does
   * step by step walthrough with new example
     * edge cases and deliminator are same with strtok_r as they are with strtok
