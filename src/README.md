@@ -32,6 +32,7 @@
   saves you time and sanity.
 
 ###Using Strtok
+#####Parsing once
 
   The example above does not make it clear exactly how `strtok` is used. Looking at how the function 
   is set up may provide the answer. Accesseing the man page for `strtok` shows the function is set up like
@@ -57,10 +58,11 @@
 	//is the same as
   	char *first_token = "Root";
 
+#####Parsing multiple times(Why we use NULL)
 
-  This is all well and good but it still does not explain why in the first example, `NULL` was used in
-  subsequent uses of `strtok` instead of the string being parsed. What were to happen if we did not do 
-  that?
+  We now know the basics of how `strtok` works, but we still do not have an explanation for why in the 
+  first example, `NULL was used instead of the string in subsequent uses of `strtok` when parsing out the 
+  next several tokens. What were to happen if we did not do that?
   Look at this program 
 
 	 #include <iostream>
@@ -86,12 +88,16 @@
   Token 1: Root
   Token 2: beg
   ```
-  However when the program is compiled and executed, the output you do get is this
+  However when the program is compiled and executed, the output you get is this
   ```
   Token 1: Root
   Token 2: Root
   ```
-
+  Why does this happen? Why doesn't `strtok` recognize that we are trying to get the next token in `example_2`?
+  The answer is because whenever a `char *` variable is passed into `strtok`, it assumes that this is a new
+  string to parse, and thus starts over from the beginning regardless of whether the new variable is the same as
+  the one before. When `NULL` is passed in however, `strtok` is not given a new variable and thus looks back at
+  the last one that was passed to it.
 
   * Look back at example given to see how strtok works
     * brief overview of how strtok works
@@ -101,22 +107,35 @@
       * go over what happens when you change deliminator
       * deliminator is literal, it will search for the exact character when extracting tokens
         * There is an execption with whitespace characters, (either single space is interpreted as
-	   all, or what I did in my assignments)
-
-#####Parsing Multiple Strings
-
-  * Mention parsing mutiple strings
-    * What will happen if midway parsing through one we begin parsing another?
+	   all types of whitespace, or " \t\n\v\f\r" as the delimiter means look for all whitespace and not
+	   look for this exact sequence of characters)
 
 ###Enter the _r (Parsing multiple strings)
 
+  * Mention parsing mutiple strings
+    * What will happen if midway parsing through one we begin parsing another?
   * See how strtok_r works
     * note similarity to strtok with addition of saveptr
     * what saveptr does
   * step by step walthrough with new example
     * edge cases and deliminator are same with strtok_r as they are with strtok
 
-###Things to Remember
+###Recap(Or if you didn't want to read everything else)
 
-  Not sure about what to put here yet, might just remove it.
+  * `strtok` can be used to parse strings
+  * function setup for `strtok`
+  ```
+  #include <string.h>
+  char *strtok(char *str, const char *delim);
+  ```
+  * when continuing to parse the same string, `str` should be `NULL` in each subsequent call to `strtok`
+  * the delimiter is what you say it is and must always be specified
+    * can be a letter or a word
+    * delimiters at the at the start and end of `str` are ignored
+  * strtok_r is used to parse multiple strings at once
+  * function setup for `strtok_r`
+  ```
+  #include <string.h>
+  char *strtok_r(char *str, const char *delim, char **saveptr);
+  ```
 
