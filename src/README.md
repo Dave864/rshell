@@ -56,8 +56,7 @@
   char *first_token = strtok(example_1, "a");
   //is the same as
   char *first_token = "Root";
-  ```
-
+  ```   
 
   This is all well and good but it still does not explain why in the first example, `NULL` was used in
   subsequent uses of `strtok` instead of the string being parsed. What were to happen if we did not do 
