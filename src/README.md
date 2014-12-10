@@ -58,7 +58,7 @@
 	//is the same as
   	char *first_token = "Root";
 
-#####Parsing multiple times(Why we use NULL)
+#####Why We Use NULL (Parsing multiple times)
 
   We now know the basics of how `strtok` works, but we still do not have an explanation for why in the 
   first example, `NULL was used instead of the string in subsequent uses of `strtok` when parsing out the 
