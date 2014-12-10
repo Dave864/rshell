@@ -23,7 +23,7 @@
   the
   power
   of
-  strtok
+  strtok!
   ```
 
 #####Why You Should Care
@@ -45,10 +45,10 @@
   in `str` that does not contain `delim`.
 
   Let's look at another example and break down what is going on
-  ``
+  ```
   char *example_1 = Rootabega;
   char *first_token = strtok(example_1, "a");
-  ``
+  ```
   Here we are parsing the string "Rootabega". The deliminator is the letter "a". So we are looking for
   the first substring in "Rootabega" that does not have the letter "a" in it. From this we see that 
   `first_token` will be assigned the word "Root", the first token of the string.
@@ -58,8 +58,9 @@
   char *first_token = "Root";
   ```
 
-  This is all well and good but it still does not explain why in the first example, `NULL` was used in 
-  place of the string we were parsing in subsequent uses of `strtok`. What were to happen if we did not do 
+
+  This is all well and good but it still does not explain why in the first example, `NULL` was used in
+  subsequent uses of `strtok` instead of the string being parsed. What were to happen if we did not do 
   that?
   Look at this program 
   ```
@@ -68,23 +69,34 @@
 
   int main()
   {
-  	char *example_2 = "Alfalfa";
+  	char *example_2 = "Rootabeganot";
 	
-	//bet the first two tokens
+	//get the first two tokens
 	char *first_token = strtok(example_2, "a");
 	char *second_token = strtok(example_2, "a");
 
 	//display the first two tokens
 	cout << "Token 1: " << first_token << endl
-		<< "Token 2: " << second_token << endl;
+	     << "Token 2: " << second_token << endl;
   	return 0;
   }
+  ```
+  Based on what has been learned from how the function is set up one would expect the output to look something
+  like this
+  ```
+  Token 1: Root
+  Token 2: beg
+  ```
+  However when the program is compiled and executed, the output you do get is this
+  ```
+  Token 1: Root
+  Token 2: Root
   ```
 
   * Look back at example given to see how strtok works
     * brief overview of how strtok works
     * step by step walkthrough of what is going on in example
-      * go oveer what happens if deliminating character is not in the string being parsed
+      * go over what happens if deliminating character is not in the string being parsed
       * go over cases where deliminator is at beginning, end, or both
       * go over what happens when you change deliminator
       * deliminator is literal, it will search for the exact character when extracting tokens
