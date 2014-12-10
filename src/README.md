@@ -61,7 +61,7 @@
 #####Why We Use NULL (Parsing multiple times)
 
   We now know the basics of how `strtok` works, but we still do not have an explanation for why in the 
-  first example, `NULL was used instead of the string in subsequent uses of `strtok` when parsing out the 
+  first example, `NULL` was used instead of the string in subsequent uses of `strtok` when parsing out the 
   next several tokens. What were to happen if we did not do that?
   Look at this program 
 
@@ -143,7 +143,11 @@
   //second_token = "beg"
   //"bega" is removed from "beganot" to get "not", which is saved for later
   ```
+  So we know now why `NULL` is used in strtok. However, looking at this example raises the question of what would
+  happen if we wanted to get the third token? This also bring up another question, what would happen if we tried 
+  to go beyond that?
 
+#####Outline for Using Strtok
   * Look back at example given to see how strtok works
     * brief overview of how strtok works
     * step by step walkthrough of what is going on in example
