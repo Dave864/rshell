@@ -124,6 +124,7 @@
 
   * `strtok` can be used to parse strings
   * function setup for `strtok`
+
   ```
   #include <string.h>
   char *strtok(char *str, const char *delim);
@@ -134,6 +135,7 @@
     * delimiters at the at the start and end of `str` are ignored
   * strtok_r is used to parse multiple strings at once
   * function setup for `strtok_r`
+  	
   ```
   #include <string.h>
   char *strtok_r(char *str, const char *delim, char **saveptr);
