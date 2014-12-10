@@ -70,7 +70,7 @@
 
  	 int main()
   	{
-  		char *example_2 = "Rootabeganot";
+  		char example_2[] = "Rootabeganot";
 	
 		//get the first two tokens
 		char *first_token = strtok(example_2, "a");
@@ -82,8 +82,7 @@
   		return 0;
   	}
 
-  Based on what has been learned from how the function is set up one would expect the output to look something
-  like this
+  Based on what has been learned from how the function is set up you expect the output to look like this
   ```
   Token 1: Root
   Token 2: beg
@@ -93,11 +92,57 @@
   Token 1: Root
   Token 2: Root
   ```
-  Why does this happen? Why doesn't `strtok` recognize that we are trying to get the next token in `example_2`?
-  The answer is because whenever a `char *` variable is passed into `strtok`, it assumes that this is a new
-  string to parse, and thus starts over from the beginning regardless of whether the new variable is the same as
-  the one before. When `NULL` is passed in however, `strtok` is not given a new variable and thus looks back at
-  the last one that was passed to it.
+  Why does this happen? The answer is because whenever a `str` is passed into `strtok`, it assumes 
+  that this is a new string to parse. The way `strtok` works is that whenever it finds a token, it removes that 
+  token and the following deliminator from the string being looked at. It then holds on to the rest of the string
+  to be use as the "default" if no string is passed in. So in the above program, both calls to `strtok` essentially
+  recieved a new string to parse.
+
+  With this in mind let's change the above program and walk through what is happening.
+  ```
+	 #include <iostream>
+ 	 #include <string.h>
+
+ 	 int main()
+  	{
+  		char example_2[] = "Rootabeganot";
+	
+		//get the first two tokens
+		char *first_token = strtok(example_2, "a");
+		char *first_copy = strtok(example_2, "a");//changed variable name
+		char *second_token = strtok(NULL, "a");         //added this new command
+
+		//display the first two tokens
+		cout << "Token 1: " << first_token << endl
+	     	<< "Token 2: " << second_token << endl;
+  		return 0;
+  	}
+  ```
+  In the first call to `strtok` the first token is found to be "Root". The function then removes the token and
+  the delimiter from the `str` argument and saves this new string for later use.
+  ```
+  char *first_token = strtok(example_2, "a");
+  //first_token = "Root"
+  //"Roota" is removed from "Rootabeganot" to get "beganot", which is saved for later
+  ```
+  In the second call to `strtok`, a new value was passed into the `str` argument, overriding the previous saved
+  string. The function runs like before; getting the token, removing it and the delimiter and saving the new 
+  string for later.
+  ```
+  char *first_copy = strtok(example_2, "a");
+  //a new str argument was given, so the saved string from before, "beganot", is ignored
+  //first_copy = "Root"
+  //"Roota" is removed from "Rootabeganot" to get "beganot", which is saved for later
+  ```
+  In the third call to `strtok`, no new argument is given, since `NULL` means nothing, so the previous saved 
+  string is used for the `str` argument and the function runs as before.
+  ```
+  char *second_token = strtok(NULL, "a");
+  //NULL, or nothing, is passed in to the str argument
+  //find first token from "beganot"
+  //second_token = "beg"
+  //"bega" is removed from "beganot" to get "not", which is saved for later
+  ```
 
   * Look back at example given to see how strtok works
     * brief overview of how strtok works
