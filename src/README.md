@@ -107,7 +107,7 @@
       * go over what happens when you change deliminator
       * deliminator is literal, it will search for the exact character when extracting tokens
         * There is an execption with whitespace characters, (either single space is interpreted as
-	   all types of whitespace, or " \t\n\v\f\r" as the delimiter means look for all whitespace and not
+	   all types of whitespace, or `" \t\n\v\f\r"` as the delimiter means look for all whitespace and not
 	   look for this exact sequence of characters)
 
 ###Enter the _r (Parsing multiple strings)
