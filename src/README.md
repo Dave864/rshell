@@ -45,41 +45,39 @@
   in `str` that does not contain `delim`.
 
   Let's look at another example and break down what is going on
-  ```
-  char *example_1 = Rootabega;
-  char *first_token = strtok(example_1, "a");
-  ```
+
+  	char *example_1 = Rootabega;
+ 	char *first_token = strtok(example_1, "a");
+
   Here we are parsing the string "Rootabega". The deliminator is the letter "a". So we are looking for
   the first substring in "Rootabega" that does not have the letter "a" in it. From this we see that 
   `first_token` will be assigned the word "Root", the first token of the string.
-  ```
-  char *first_token = strtok(example_1, "a");
-  //is the same as
-  char *first_token = "Root";
-  ```   
+	char *first_token = strtok(example_1, "a");
+	//is the same as
+  	char *first_token = "Root";
 
   This is all well and good but it still does not explain why in the first example, `NULL` was used in
   subsequent uses of `strtok` instead of the string being parsed. What were to happen if we did not do 
   that?
   Look at this program 
-  ```
-  #include <iostream>
-  #include <string.h>
 
-  int main()
-  {
-  	char *example_2 = "Rootabeganot";
+	 #include <iostream>
+ 	 #include <string.h>
+
+ 	 int main()
+  	{
+  		char *example_2 = "Rootabeganot";
 	
-	//get the first two tokens
-	char *first_token = strtok(example_2, "a");
-	char *second_token = strtok(example_2, "a");
+		//get the first two tokens
+		char *first_token = strtok(example_2, "a");
+		char *second_token = strtok(example_2, "a");
 
-	//display the first two tokens
-	cout << "Token 1: " << first_token << endl
-	     << "Token 2: " << second_token << endl;
-  	return 0;
-  }
-  ```
+		//display the first two tokens
+		cout << "Token 1: " << first_token << endl
+	     	<< "Token 2: " << second_token << endl;
+  		return 0;
+  	}
+
   Based on what has been learned from how the function is set up one would expect the output to look something
   like this
   ```
