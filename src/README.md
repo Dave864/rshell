@@ -7,7 +7,7 @@
 
   What this means is that you, the user, can take the word
   ```
-  char *example_0 = behold+the+power+of+strtok!;
+  char example_0[] = "behold+the+power+of+strtok!";
   ```
   and split it up into smaller components that are separated by the character `+`
   ```
@@ -32,7 +32,7 @@
   saves you time and sanity.
 
 ###The Way of Strtok
-#####**One Small Step for String** (Parsing once)
+#####One Small Step for String(Parsing once)
 
   The example above does not make it clear exactly how `strtok` is used. Looking at how the function 
   is set up may provide the answer. Accesseing the man page for `strtok` shows the function is set up like
@@ -47,7 +47,7 @@
 
   Let's look at another example and break down what is going on
 
-  	char *example_1 = Rootabega;
+  	char example_1[] = Rootabega;
  	char *first_token = strtok(example_1, "a");
 
   Here we are parsing the string "Rootabega". The deliminator is the letter "a". So we are looking for
@@ -58,7 +58,7 @@
 	//is the same as
   	char *first_token = "Root";
 
-#####**Gaze into the NULL**(Parsing multiple times)
+#####Gaze into the NULL (Parsing multiple times)
 
   We now know the basics of how `strtok` works, but we still do not have an explanation for why in the 
   first example, `NULL` was used instead of the string in subsequent uses of `strtok` when parsing out the 
@@ -67,6 +67,7 @@
 
 	 #include <iostream>
  	 #include <string.h>
+	 using namespace std;
 
  	 int main()
   	{
@@ -82,7 +83,7 @@
   		return 0;
   	}
 
-  Based on what has been learned from how the function is set up you expect the output to look like this
+  Based on what has been learned from how the function is set up you would expect the output to look like this
   ```
   Token 1: Root
   Token 2: beg
@@ -92,16 +93,17 @@
   Token 1: Root
   Token 2: Root
   ```
-  Why does this happen? The answer is because whenever a `str` is passed into `strtok`, it assumes 
-  that this is a new string to parse. The way `strtok` works is that whenever it finds a token, it removes that 
-  token and the following deliminator from the string being looked at. It then holds on to the rest of the string
-  to be use as the "default" if no string is passed in. So in the above program, both calls to `strtok` essentially
-  recieved a new string to parse.
+  Why does this happen? The answer is because whenever something is passed into the `str` argument for`strtok`,
+  the function assumes that this is a new string to parse. The way `strtok` works is that whenever it finds a t
+  oken, it removes that token and the following deliminator from the string being looked at. It then holds on to 
+  the rest of the string to be use as the "default" if no string is passed in. In the above program, both 
+  calls to `strtok` recieved a new string to parse, overriding the default value.
 
   With this in mind let's change the above program and walk through what is happening.
   ```
 	 #include <iostream>
  	 #include <string.h>
+	 using namespace std;
 
  	 int main()
   	{
@@ -110,7 +112,7 @@
 		//get the first two tokens
 		char *first_token = strtok(example_2, "a");
 		char *first_copy = strtok(example_2, "a");//changed variable name
-		char *second_token = strtok(NULL, "a");         //added this new command
+		char *second_token = strtok(NULL, "a");   //added this new command
 
 		//display the first two tokens
 		cout << "Token 1: " << first_token << endl
@@ -147,31 +149,154 @@
   happen if we wanted to get the third token? This also bring up another question, what would happen if we tried 
   to go beyond that?
 
-#####**The Last Token and Beyond!** (Rules of the delimiter)
+#####The Last Token and Beyond! (Rules of the delimiter)
+  In the previous example we took the string "Rootabeganot" and used the `strtok` function to extract the first
+  two tokens of this string using "a" as the delimiter. Looking at what remains after getting the tokens, "Root"
+  and "beg", we see that the string still contains "not". Looking at this string, the delimiter "a" is nowhere
+  to be found. So what would happen if we ran `strtok` again? What if we ran it after that?
 
-#####Outline for Using Strtok
-  * Look back at example given to see how strtok works
-    * brief overview of how strtok works
-    * step by step walkthrough of what is going on in example
-      * go over what happens if deliminating character is not in the string being parsed
-      * go over cases where deliminator is at beginning, end, or both
-      * go over what happens when you change deliminator
-      * deliminator is literal, it will search for the exact character when extracting tokens
-        * There is an execption with whitespace characters, (either single space is interpreted as
-	   all types of whitespace, or `" \t\n\v\f\r"` as the delimiter means look for all whitespace and not
-	   look for this exact sequence of characters)
+  Let's modify the program from before and find out
+  ```
+	 #include <iostream>
+ 	 #include <string.h>
+	 using namespace std;
 
-###**The Hidden _r** (Parsing multiple strings)
+ 	 int main()
+  	{
+  		char example_2[] = "Rootabeganot";
+	
+		//get the tokens
+		char *first_token = strtok(example_2, "a");
+		char *second_token = strtok(NULL, "a");
+		char *third_token = strtok(NULL, "a");
+		char *fourth_token = strtok(NULL, "a");
+
+		//display the tokens
+		cout << "Token 1: " << first_token << endl
+	     	<< "Token 2: " << second_token << endl
+			<< "Token 3: " << third_token << endl
+			<< "Token 4: " << fourth_token << endl;
+  		return 0;
+  	}
+  ```
+  Running this program gives us the following output
+  ```
+  Token 1: Root
+  Token 2: beg
+  Token 3: not
+  Token 4:
+  ```
+  From this we see that `strtok` was able to get the last token, even though the delimiter was not in it, and
+  that the function is able to handle the case of an empty string.
+
+  In **One Small Step for String** it was stated that to get the token, `strtok` looks for the first substring
+  in the `str` argument that does not contain the deliminator `delim`. So, if the delimiter is not in the `str`
+  argument, then the entire argument is considered to be the token.
+
+  Here is another example of this
+  ```
+  char example_3[] = "This is the entire token";
+  char *first_token = strtok(example_3, "A");
+  //Look for the first occurence of "A"
+  //"A" was not found
+  //first_token = "This is the entire token";
+  ```
+  In the case when there is nothing left to look at, or if nothing was initially passed in to the `str` argument,
+  `strtok` returns `NULL`. This enables the use of `while` loops for parsing a string.
+  ```
+  	#include <iostream>
+	#include <string.h>
+	using namespace std;
+
+	int main()
+	{
+		char example_4[] = "See how% the modulo blade%slices % through % this string";
+		char *token;
+		token = strtok(example_4, "%");
+		//prints out each token in example_4
+		while(token != NULL)
+		{
+			cout << token << endl;
+			token = strtok(NULL, "%");
+		}
+		return 0;
+	}
+	//Output:
+	//See how
+	// the modulo blade
+	//slices 
+	// through 
+	// this string
+  ```
+  We know know what happens when the delimiter is not in the `str` argument. What if, however, the delimiter
+  were at the beginning and or end of the `str` argument? What about if the delimiter was chained together
+  multiple times?
+
+  In the case of the delimiter appearing at the ends of the `str` argument, `strtok` simply ignores them.
+  ```
+  char example_6[] = "@ What happens@to delimiters@ at the ends@";
+  char *token = strtok(example_6, "@");
+  //in strtok
+  //@ What happens@to delimiters@ at the ends@ 
+  //is seen as
+  // What happens@to delimiters@ at the ends
+  ```
+  For the case where the deliminator is chained together multiple times, each instance where that happens is
+  the same as if the deliminator was only placed once.
+  ```
+  char example_7[] = "@@ What @@happens to @ chained @@@@@ delimiters";
+  char *token = strtok(example_7, "@");
+  //in strtok
+  //@@ What @@happens to @ chained @@@@@ delimiters 
+  //is the same as
+  //@ What @happens to @ chained @ delimiters
+  //which is then seen as
+  // What @happens to @ chained @ delimiters
+  ```
+
+  So far we have only been using examples where the delimiter is only one letter or character. The `strtok`
+  function can actually take in multicharacter strings as its delimiter. However, when this is done, the
+  function doesn't look for the first occurence of the exact character pattern when gettin the token; it looks 
+  for the first occurence of any of the characters passed into the `delim` argument.
+  ```
+	#include <iostream>
+	#include <string.h>
+	using namespace std;
+
+	int main()
+	{
+		char example_8[] = "Testing 1 to 2 find 12 many 21 delims 121 in a 212 string";
+		char *token;
+		token = strtok(example_8, "12");
+		//prints out each token in example_4
+		while(token != NULL)
+		{
+			cout << token << endl;
+			token = strtok(NULL, "12");
+		}
+		return 0;
+	}
+	//Output:
+	//Testing 
+	// to 
+	// find 
+	// many 
+	// delims
+	// in a 
+	// string
+  ```
+
+###The Hidden _r (Parsing multiple strings)
 
   * Mention parsing mutiple strings
     * What will happen if midway parsing through one we begin parsing another?
   * See how strtok_r works
     * note similarity to strtok with addition of saveptr
     * what saveptr does
-  * step by step walthrough with new example
+  * step by step walkthrough with new example
     * edge cases and deliminator are same with strtok_r as they are with strtok
 
-###**Recap** (Or if you didn't want to read everything else)
+###Recap (Or if you didn't want to read everything else)
 
   * `strtok` can be used to parse strings
   * function setup for `strtok`
@@ -181,9 +306,12 @@
   char *strtok(char *str, const char *delim);
   ```
   * when continuing to parse the same string, `str` should be `NULL` in each subsequent call to `strtok`
-  * the delimiter is what you say it is and must always be specified
-    * can be a letter or a word
-    * delimiters at the at the start and end of `str` are ignored
+  * if there is nothing left to parse, `strtok` returns `NULL`
+  * rules of `delim`, the delimiter
+    * this must always be specified when using `strtok`
+    * is ignored when at the beginning or end of the `str` argument
+    * `strtok` looks for the first occurrence of any character in `delim`, not the exact pattern that was
+    passed in
   * strtok_r is used to parse multiple strings at once
   * function setup for `strtok_r`
   	
@@ -191,4 +319,5 @@
   #include <string.h>
   char *strtok_r(char *str, const char *delim, char **saveptr);
   ```
+  * `strtok_r` follows the same rules as `strtok` with the addition of the `saveptr` argument
 
