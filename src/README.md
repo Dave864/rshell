@@ -26,13 +26,13 @@
   strtok!
   ```
 
-#####Why You Should Care
+####Why You Should Care
 
   When used appropriately, strtok can make string parsing very easy to do, which
   saves you time and sanity.
 
 ###The Way of Strtok
-#####One Small Step for String(Parsing once)
+####One Small Step for String(Parsing once)
 
   The example above does not make it clear exactly how `strtok` is used. Looking at how the function 
   is set up may provide the answer. Accesseing the man page for `strtok` shows the function is set up like
@@ -58,7 +58,7 @@
 	//is the same as
   	char *first_token = "Root";
 
-#####Gaze into the NULL (Parsing multiple times)
+####Gaze into the NULL (Parsing multiple times)
 
   We now know the basics of how `strtok` works, but we still do not have an explanation for why in the 
   first example, `NULL` was used instead of the string in subsequent uses of `strtok` when parsing out the 
@@ -149,7 +149,7 @@
   happen if we wanted to get the third token? This also bring up another question, what would happen if we tried 
   to go beyond that?
 
-#####The Last Token and Beyond! (Rules of the delimiter)
+####The Last Token and Beyond! (Rules of the delimiter)
   In the previous example we took the string "Rootabeganot" and used the `strtok` function to extract the first
   two tokens of this string using "a" as the delimiter. Looking at what remains after getting the tokens, "Root"
   and "beg", we see that the string still contains "not". Looking at this string, the delimiter "a" is nowhere
@@ -186,7 +186,7 @@
   Token 3: not
   Token 4:
   ```
-  From this we see that `strtok` was able to get the last token, even though the delimiter was not in it, and
+  From this we see that `strtok` is able to get the last token, even though the delimiter was not in it, and
   that the function is able to handle the case of an empty string.
 
   In **One Small Step for String** it was stated that to get the token, `strtok` looks for the first substring
@@ -228,9 +228,8 @@
 	// through 
 	// this string
   ```
-  We know know what happens when the delimiter is not in the `str` argument. What if, however, the delimiter
-  were at the beginning and or end of the `str` argument? What about if the delimiter was chained together
-  multiple times?
+  We know now what happens when the delimiter is not in the `str` argument. What if, however, the delimiter
+  were at the beginning and or end of the it? What about if the delimiter was chained together multiple times?
 
   In the case of the delimiter appearing at the ends of the `str` argument, `strtok` simply ignores them.
   ```
