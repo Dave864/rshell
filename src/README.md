@@ -254,7 +254,7 @@
   ```
 
   So far we have only been using examples where the delimiter is only one letter or character. The `strtok`
-  function can actually take in multicharacter strings as its delimiter. However, when this is done, the
+  function can actually take in multi-character strings as its delimiter. However, when this is done, the
   function doesn't look for the first occurence of the exact character pattern when gettin the token; it looks 
   for the first occurence of any of the characters passed into the `delim` argument.
   ```
@@ -285,6 +285,34 @@
 	// string
   ```
 
+  It should also be noted that in subsequent calls to `strtok` when parsing a string, you can change what the
+  delimiter is to get different tokens.
+  ```
+	#include <iostream>
+	#include <string.h>
+	using namespace std;
+
+	int main()
+	{
+		char example_9[] = "I have/changed my delimiter?partway through";
+		char *token;
+		token = strtok(example_9, "/");
+		cout << token << endl;
+		token = strtok(NULL, " ");
+		cout << token << endl;
+		token = strtok(NULL, "?");
+		cout << token << endl;
+		token = strtok(NULL, "+");
+		cout << token << endl;
+		return 0;
+	}
+	//Output:
+	//I have
+	//changed
+	//my delimiter
+	//partway through
+  ```
+
 ###The Hidden _r (Parsing multiple strings)
 
   * Mention parsing mutiple strings
@@ -295,7 +323,7 @@
   * step by step walkthrough with new example
     * edge cases and deliminator are same with strtok_r as they are with strtok
 
-###Recap (Or if you didn't want to read everything else)
+###Recap (And for those who didn't want to read everything else)
 
   * `strtok` can be used to parse strings
   * function setup for `strtok`
