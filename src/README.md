@@ -31,8 +31,8 @@
   When used appropriately, strtok can make string parsing very easy to do, which
   saves you time and sanity.
 
-###Using Strtok
-#####Parsing once
+###The Way of Strtok
+#####**One Small Step for String** (Parsing once)
 
   The example above does not make it clear exactly how `strtok` is used. Looking at how the function 
   is set up may provide the answer. Accesseing the man page for `strtok` shows the function is set up like
@@ -58,7 +58,7 @@
 	//is the same as
   	char *first_token = "Root";
 
-#####Why We Use NULL (Parsing multiple times)
+#####**Gaze into the NULL**(Parsing multiple times)
 
   We now know the basics of how `strtok` works, but we still do not have an explanation for why in the 
   first example, `NULL` was used instead of the string in subsequent uses of `strtok` when parsing out the 
@@ -147,6 +147,8 @@
   happen if we wanted to get the third token? This also bring up another question, what would happen if we tried 
   to go beyond that?
 
+#####**The Last Token and Beyond!** (Rules of the delimiter)
+
 #####Outline for Using Strtok
   * Look back at example given to see how strtok works
     * brief overview of how strtok works
@@ -159,7 +161,7 @@
 	   all types of whitespace, or `" \t\n\v\f\r"` as the delimiter means look for all whitespace and not
 	   look for this exact sequence of characters)
 
-###Enter the _r (Parsing multiple strings)
+###**The Hidden _r** (Parsing multiple strings)
 
   * Mention parsing mutiple strings
     * What will happen if midway parsing through one we begin parsing another?
@@ -169,7 +171,7 @@
   * step by step walthrough with new example
     * edge cases and deliminator are same with strtok_r as they are with strtok
 
-###Recap(Or if you didn't want to read everything else)
+###**Recap** (Or if you didn't want to read everything else)
 
   * `strtok` can be used to parse strings
   * function setup for `strtok`
