@@ -3,7 +3,7 @@
 ###What is Strtok?
 
   The `strtok` function lets you take a character array and break it up into
-  smaller substrings, with each one being separated by another specified character.
+  smaller substrings, with each one being separated by a specified character.
 
   What this means is that you, the user, can take the word
   ```
@@ -32,10 +32,10 @@
   saves you time and sanity.
 
 ###The Way of Strtok
-####One Small Step for String(Parsing once)
+####One Small Step for String (Parsing once)
 
   The example above does not make it clear exactly how `strtok` is used. Looking at how the function 
-  is set up may provide the answer. Accesseing the man page for `strtok` shows the function is set up like
+  is set up may show some clues. Accesseing the man page for `strtok` shows the function is set up like
   this.
   ```
   #include <string.h>
@@ -60,10 +60,9 @@
 
 ####Gaze into the NULL (Parsing multiple times)
 
-  We now know the basics of how `strtok` works, but we still do not have an explanation for why in the 
-  first example, `NULL` was used instead of the string in subsequent uses of `strtok` when parsing out the 
-  next several tokens. What were to happen if we did not do that?
-  Look at this program 
+  We now know the basics of how `strtok` works, but still do not have an explanation for why, in the 
+  first example, `NULL` was used in subsequent uses of `strtok` when parsing out the next several tokens.
+  What were to happen if we did not do that? Look at this program 
 
 	 #include <iostream>
  	 #include <string.h>
@@ -83,7 +82,7 @@
   		return 0;
   	}
 
-  Based on what has been learned from how the function is set up you would expect the output to look like this
+  Based on what has been learned from how the `strtok` is set up you would expect the output to look like this
   ```
   Token 1: Root
   Token 2: beg
@@ -93,11 +92,11 @@
   Token 1: Root
   Token 2: Root
   ```
-  Why does this happen? The answer is because whenever something is passed into the `str` argument for`strtok`,
+  Why does this happen? The answer is whenever something is passed into the `str` argument for`strtok`,
   the function assumes that this is a new string to parse. The way `strtok` works is that whenever it finds a t
   oken, it removes that token and the following deliminator from the string being looked at. It then holds on to 
-  the rest of the string to be use as the "default" if no string is passed in. In the above program, both 
-  calls to `strtok` recieved a new string to parse, overriding the default value.
+  the rest of the string to be use as the "default" if no string is passed in the next time `strtok` is called. 
+  In the above program, both calls recieved a new string to parse, overriding the default value.
 
   With this in mind let's change the above program and walk through what is happening.
   ```
@@ -120,7 +119,7 @@
   		return 0;
   	}
   ```
-  In the first call to `strtok` the first token is found to be "Root". The function then removes the token and
+  In the first call to `strtok`, the first token is found to be "Root". The function then removes the token and
   the delimiter from the `str` argument and saves this new string for later use.
   ```
   char *first_token = strtok(example_2, "a");
@@ -128,7 +127,7 @@
   //"Roota" is removed from "Rootabeganot" to get "beganot", which is saved for later
   ```
   In the second call to `strtok`, a new value was passed into the `str` argument, overriding the previous saved
-  string. The function runs like before; getting the token, removing it and the delimiter and saving the new 
+  string. The function then runs like before; getting the token, removing it and the delimiter and saving the new 
   string for later.
   ```
   char *first_copy = strtok(example_2, "a");
@@ -146,14 +145,14 @@
   //"bega" is removed from "beganot" to get "not", which is saved for later
   ```
   So we know now why `NULL` is used in strtok. However, looking at this example raises the question of what would
-  happen if we wanted to get the third token? This also bring up another question, what would happen if we tried 
+  happen if we wanted to get the third token? This also brings up another question, what would happen if we tried 
   to go beyond that?
 
 ####The Last Token and Beyond! (Rules of the delimiter)
   In the previous example we took the string "Rootabeganot" and used the `strtok` function to extract the first
   two tokens of this string using "a" as the delimiter. Looking at what remains after getting the tokens, "Root"
-  and "beg", we see that the string still contains "not". Looking at this string, the delimiter "a" is nowhere
-  to be found. So what would happen if we ran `strtok` again? What if we ran it after that?
+  and "beg", we see that the string "not" still remains. The delimiter "a", however, is nowhere to be found. 
+  So what would happen if we ran `strtok` again? What if we ran it after that?
 
   Let's modify the program from before and find out
   ```
@@ -186,14 +185,12 @@
   Token 3: not
   Token 4:
   ```
-  From this we see that `strtok` is able to get the last token, even though the delimiter was not in it, and
-  that the function is able to handle the case of an empty string.
+  From this we see that `strtok` was able to get the last token, even though the delimiter was not in it, and
+  that the function was able to handle the case of an empty string. Why is that?
 
   In **One Small Step for String** it was stated that to get the token, `strtok` looks for the first substring
   in the `str` argument that does not contain the deliminator `delim`. So, if the delimiter is not in the `str`
   argument, then the entire argument is considered to be the token.
-
-  Here is another example of this
   ```
   char example_3[] = "This is the entire token";
   char *first_token = strtok(example_3, "A");
@@ -201,7 +198,7 @@
   //"A" was not found
   //first_token = "This is the entire token";
   ```
-  In the case when there is nothing left to look at, or if nothing was initially passed in to the `str` argument,
+  In the case when there is nothing left to look at, or if nothing was initially passed to the `str` argument,
   `strtok` returns `NULL`. This enables the use of `while` loops for parsing a string.
   ```
   	#include <iostream>
@@ -255,8 +252,8 @@
 
   So far we have only been using examples where the delimiter is only one letter or character. The `strtok`
   function can actually take in multi-character strings as its delimiter. However, when this is done, the
-  function doesn't look for the first occurence of the exact character pattern when gettin the token; it looks 
-  for the first occurence of any of the characters passed into the `delim` argument.
+  function doesn't look for the first occurence of the exact sequence; it looks for the first occurence of 
+  any of the characters passed into the `delim` argument.
   ```
 	#include <iostream>
 	#include <string.h>
@@ -315,8 +312,10 @@
 
 ###The Hidden _r (Parsing multiple strings)
 
+  
   * Mention parsing mutiple strings
     * What will happen if midway parsing through one we begin parsing another?
+    * What will happen if we begin parsing a new string after completely parsing the old one?
   * See how strtok_r works
     * note similarity to strtok with addition of saveptr
     * what saveptr does
