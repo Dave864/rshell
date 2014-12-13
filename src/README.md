@@ -379,10 +379,10 @@
 
 		//parse string_1
 		token = strtok(string_1, " ");
-		cout << "Tokens of string_1:" << endl;
+		cout << "   Tokens of string_1:" << endl;
 		for(int i = 0; token != NULL; i++)
 		{
-			cout << token << endl;
+			cout << "   " << token << endl;
 			if(i == 1)
 			{
 				//parse string_2
@@ -402,12 +402,11 @@
 	//Tokens of string_1:
 	//Parse
 	//all
-	//
-	//Tokens of string_2:
-	//If
-	//I
-	//may
-	//interrupt.
+	//   Tokens of string_2:
+	//   If
+	//   I
+	//   may
+	//   interrupt.
   ```
   Looking at the output of the program, we see that only part of `string_1` was partly parsed before `string_2`
   was fully parsed. However, after that the output ceased. From looking at the program and from what we know of
@@ -469,9 +468,55 @@
   #include <string.h>
   char *strtok_r(char *str, const char *delim, char **saveptr);
   ```
+  It looks exactly the same as that for `strtok`, except that it takes in an additional argument, `saveptr`. The
+  `str` and `delim` arguments function for `strtok_r` the same way they do for `strtok`. The `saveptr` argument,
+  as stated before, serves as a way to keep track of what is left to be parsed in `str`.
+  
+  Let's use it in the program to get a better idea of how to use `saveptr`.
+  ```
+	#include <iostream>
+	#include <string.h>
+	using namespace std;
 
-  * step by step walkthrough with new example
-    * edge cases and deliminator are same with strtok_r as they are with strtok
+	int main()
+	{
+		char string_1[] = "Parse all the things!";
+		char string_2[] = "If I may interrupt.";
+		char *token, *save_1, *save_2;
+
+		//parse string_1
+		token = strtok_r(string_1, " ", &save_1);
+		cout << "Tokens of string_1:" << endl;
+		for(int i = 0; token != NULL; i++)
+		{
+			cout << token << endl;
+			if(i == 1)
+			{
+				//parse string_2
+				token = strtok_r(string_2, " ", &save_2);
+				cout << "   Tokens of string_2:" << endl;
+				while(token != NULL)
+				{
+					cout << "   " << token << endl;
+					token = strtok_r(NULL, " ", &save_2);
+				}
+			}
+			token = strtok_r(NULL, " ", &save_1);
+		}
+		return 0;
+	}
+	//Output:
+	//Tokens of string_1:
+	//Parse
+	//all
+	//   Tokens of string_2:
+	//   If
+	//   I
+	//   may
+	//   interrupt.
+	//the
+	//things!
+  ```
 
 ###Recap (And for those who didn't want to read everything else)
 
