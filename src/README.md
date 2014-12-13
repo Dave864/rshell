@@ -312,10 +312,65 @@
 
 ###The Hidden _r (Parsing multiple strings)
 
-  
-  * Mention parsing mutiple strings
-    * What will happen if midway parsing through one we begin parsing another?
-    * What will happen if we begin parsing a new string after completely parsing the old one?
+  All that was discussed so far only went over parsing a single string for its contents. However, there will
+  be times when you will have to parse multiple strings, be it one after the other or at the same time. Are we
+  still able to use `strtok` for this?
+
+  Let's look at the case where we parse one string after the next
+  ```
+	#include <iostream>
+	#include <string.h>
+	using namespace std;
+
+	int main()
+	{
+		char string_1[] = "Parse all the things!";
+		char string_2[] = "Let's_do_it_again!";
+		char *token;
+
+		//parse string_1
+		token = strtok(string_1, " ");
+		cout << "Tokens of string_1:" << endl;
+		while(token != NULL)
+		{
+			cout << token << endl;
+			token = strtok(NULL, " ");
+		}
+
+		//parse string_2
+		token = strtok(string_2, "_");
+		cout << "\nTokens of string_2:" << endl;
+		while(token != NULL)
+		{
+			cout << token << endl;
+			token = strtok(NULL, "_");
+		}
+
+		return 0;
+	}
+	//Output:
+	//Tokens of string_1:
+	//Parse
+	//all
+	//the
+	//things!
+	//
+	//Tokens of string_2:
+	//Let's
+	//do
+	//it
+	//again!
+  ```
+  Looking at the output of this program we see that `strtok` is able to correctly parse multiple strings if
+  each is parsed completely before the next one.
+
+  Now let's look at the case where we parse strings simultaneously. When two strings are parsed in this manner,
+  it means that while one string is being parsed, we begin to parse another string, like what is happening in
+  the program below.
+  ```
+  ```
+
+  * What will happen if midway parsing through one we begin parsing another?
   * See how strtok_r works
     * note similarity to strtok with addition of saveptr
     * what saveptr does
