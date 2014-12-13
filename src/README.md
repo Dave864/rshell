@@ -364,16 +364,112 @@
   Looking at the output of this program we see that `strtok` is able to correctly parse multiple strings if
   each is parsed completely before the next one.
 
-  Now let's look at the case where we parse strings simultaneously. When two strings are parsed in this manner,
-  it means that while one string is being parsed, we begin to parse another string, like what is happening in
-  the program below.
+  Now let's look at the case where we parse multiple strings simultaneously. What this means is we begin to 
+  parse a string while another string is being parsed, like what is happening in the program below.
   ```
+	#include <iostream>
+	#include <string.h>
+	using namespace std;
+
+	int main()
+	{
+		char string_1[] = "Parse all the things!";
+		char string_2[] = "If I may interrupt.";
+		char *token;
+
+		//parse string_1
+		token = strtok(string_1, " ");
+		cout << "Tokens of string_1:" << endl;
+		for(int i = 0; token != NULL; i++)
+		{
+			cout << token << endl;
+			if(i == 1)
+			{
+				//parse string_2
+				token = strtok(string_2, " ");
+				cout << "\nTokens of string_2:" << endl;
+				while(token != NULL)
+				{
+					cout << token << endl;
+					token = strtok(NULL, " ");
+				}
+			}
+			token = strtok(NULL, " ");
+		}
+		return 0;
+	}
+	//Output:
+	//Tokens of string_1:
+	//Parse
+	//all
+	//
+	//Tokens of string_2:
+	//If
+	//I
+	//may
+	//interrupt.
+  ```
+  Looking at the output of the program, we see that only part of `string_1` was partly parsed before `string_2`
+  was fully parsed. However, after that the output ceased. From looking at the program and from what we know of
+  `strtok`, it is easy to see why this ouput occurs.
+
+  Within the outer loop the program parses through `string_1` until `i` is 1.
+  ```
+  	//first use of strtok, outside of the loop
+	token = strtok(string_1, " ");
+		//token = "Parse"
+		//remaining string to parse = "all the things!"
+	//enter for loop 
+		//first iteration
+		token = strtok(NULL, " ");
+			//i = 0, don't go into while loop
+			//token = "all"
+			//remaining string to parse = "the things!"
+		//second iteration
+			//i = 1, begin parsing string_2
+			//remaining string to parse = "the things!"
+  ```
+  The program then completely parses through `string_2` in the inner loop before going back to the outer loop.
+  ```
+	//get first token
+	token = strtok(string_2, " ");
+		//remaining string to parse, "the things!", is not used and replaced with string_2
+		//token = "If"
+		//remaining string to parse = "I may interrupt."
+	//enter while loop
+		//first iteration
+		token = strtok(NULL, " ");
+			//token = "I"
+			//remaining string to parse = "may interrupt."
+		//second iteration
+		token = strtok(NULL, " ");
+			//token = "may"
+			//remaining string to parse = "interrupt."
+		//third iteration
+		token = strtok(NULL, " ");
+			//token = "interrupt."
+			//remaining string to parse = ""
+		//fourth iteration
+		token = strtok(NULL, " ");
+			//token = NULL
+			//remaining string to parse = ""
+			//exit while loop
+	//finished parsing string_2
+  ```
+  As you can see, the result of parsing `string_2` carried over into the parsing of `string_1 `, leaving nothing 
+  left to parse. This caused each successive call to `strtok` to only return NULL. What we need to do to is
+  somehow keep track of where we are in each string that we are parsing if this is to work. Unfortunately this
+  is just not possible with the `strtok` function.
+
+  It turns out that `strtok` has a brother called `strtok_r` who does exactly the same thing as `strtok`, follows
+  all the same rules as `strtok`, but does one more thing that `strtok` doesn't; it keeps track of where you
+  are in the string with something it calls **saveptr**. Here is the function declaration for `strtok_r`, found
+  on the man page for `strtok`.
+  ```
+  #include <string.h>
+  char *strtok_r(char *str, const char *delim, char **saveptr);
   ```
 
-  * What will happen if midway parsing through one we begin parsing another?
-  * See how strtok_r works
-    * note similarity to strtok with addition of saveptr
-    * what saveptr does
   * step by step walkthrough with new example
     * edge cases and deliminator are same with strtok_r as they are with strtok
 
