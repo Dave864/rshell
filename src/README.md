@@ -460,7 +460,7 @@
   somehow keep track of where we are in each string that we are parsing if this is to work. Unfortunately this
   is just not possible with the `strtok` function.
 
-  It turns out that `strtok` has a brother called `strtok_r` who does exactly the same thing as `strtok`, follows
+  As it turns out, `strtok` has a brother called `strtok_r` who does exactly the same thing as `strtok`, follows
   all the same rules as `strtok`, but does one more thing that `strtok` doesn't; it keeps track of where you
   are in the string with something it calls **saveptr**. Here is the function declaration for `strtok_r`, found
   on the man page for `strtok`.
@@ -469,10 +469,10 @@
   char *strtok_r(char *str, const char *delim, char **saveptr);
   ```
   It looks exactly the same as that for `strtok`, except that it takes in an additional argument, `saveptr`. The
-  `str` and `delim` arguments function for `strtok_r` the same way they do for `strtok`. The `saveptr` argument,
-  as stated before, serves as a way to keep track of what is left to be parsed in `str`.
+  `str` and `delim` arguments function for `strtok_r` work the same way they do for `strtok`. The `saveptr` 
+  argument, as stated before, serves as a way to keep track of what is left to be parsed in `str`.
   
-  Let's use it in the program to get a better idea of how to use `saveptr`.
+  Let's use it in the previous program and walk through what is happening..
   ```
 	#include <iostream>
 	#include <string.h>
@@ -517,6 +517,62 @@
 	//the
 	//things!
   ```
+  Within the outer loop the program parses through `string_1` until `i` is 1.
+  ```
+  	//first use of strtok, outside of the loop
+	token = strtok_r(string_1, " ", &save_1);
+		//token = "Parse"
+		//save_1 = "all the things!"
+		//save_2 = nothing
+	//enter for loop 
+		//first iteration
+		token = strtok_r(NULL, " ", &save_1);
+			//i = 0, don't go into while loop
+			//token = "all"
+			//save_1 = "the things!"
+			//save_2 = nothing
+		//second iteration
+			//i = 1, begin parsing string_2
+			//save_1 = "the things!"
+			//save_2 = nothing
+  ```
+  The program then completely parses through `string_2` in the inner loop before going back to the outer loop.
+  ```
+	//get first token
+	token = strtok_r(string_2, " ", &save_2);
+		//remaining string to parse, "the things!", is not used and replaced with string_2
+		//token = "If"
+		//save_1 = "the things!"
+		//save_2 = "I may interrupt."
+	//enter while loop
+		//first iteration
+		token = strtok_r(NULL, " ", &save_2);
+			//token = "I"
+			//save_1 = "the things!"
+			//save_2 = "may interrupt."
+		//second iteration
+		token = strtok_r(NULL, " ", &save_2);
+			//token = "may"
+			//save_1 = "the things!"
+			//save_2 = "interrupt."
+		//third iteration
+		token = strtok_r(NULL, " ", &save_2);
+			//token = "interrupt."
+			//save_1 = "the things!"
+			//save_2 = ""
+		//fourth iteration
+		token = strtok_r(NULL, " ");
+			//token = NULL
+			//save_1 = "the things!"
+			//save_2 = ""
+			//exit while loop
+	//finished parsing string_2
+  ```
+  From this we see that the saveptrs, `save_1` and `save_2`, keep track of what is left to parse in `string_1`
+  and `string_2` respectively.
+
+  As a general rule, only use `strtok` when parsing a single string and use `strtok_r` whenever you parse multiple
+  strings.
 
 ###Recap (And for those who didn't want to read everything else)
 
@@ -542,4 +598,5 @@
   char *strtok_r(char *str, const char *delim, char **saveptr);
   ```
   * `strtok_r` follows the same rules as `strtok` with the addition of the `saveptr` argument
+    * the `saveptr` argument keeps track of what is left after the first token is found
 
